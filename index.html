@@ -1755,23 +1755,29 @@ async function fetchLivePrices(silent=false){
   const btn=document.getElementById('livePriceBtn');
   const label=document.getElementById('priceSourceLabel');
   if(!silent&&btn){btn.disabled=true;btn.textContent='⟳ Fetching…';}
+  // Live prices require HTTPS origin — file:// is blocked by browser security
+  if(location.protocol==='file:'){
+    if(label)label.textContent='Manual updates';
+    if(!silent){
+      showToast('⚠ Live Prices ใช้ได้เฉพาะจาก Web — เปิดผ่าน GitHub Pages');
+      window.open('https://supakitzz.github.io/investment-dashboard/','_blank');
+    }
+    if(btn){btn.disabled=false;btn.textContent='⚡ Live Prices';}
+    return;
+  }
   let updated=0;
+  // Direct Yahoo Finance — works from HTTPS origins (GitHub Pages)
   const getPrice=async sym=>{
-    const attempts=[
-      // 1. Direct (works on HTTPS like GitHub Pages)
-      ()=>fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,{cache:'no-store'}),
-      // 2. query2 direct
-      ()=>fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,{cache:'no-store'}),
-      // 3. thingproxy
-      ()=>fetch(`https://thingproxy.freeboard.io/fetch/https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,{cache:'no-store'}),
-      // 4. corsproxy with different endpoint
-      ()=>fetch(`https://corsproxy.io/?url=${encodeURIComponent('https://yfapi.net/v6/finance/quote?symbols='+sym)}&headers=x-api-key:`,{cache:'no-store'}),
+    const urls=[
+      `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,
+      `https://query2.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,
     ];
-    for(const fn of attempts){
+    for(const url of urls){
       try{
-        const res=await fn();if(!res.ok)continue;
-        const data=await res.json();
-        const p=data?.chart?.result?.[0]?.meta?.regularMarketPrice||data?.quoteResponse?.result?.[0]?.regularMarketPrice;
+        const r=await fetch(url,{cache:'no-store'});
+        if(!r.ok)continue;
+        const data=await r.json();
+        const p=data?.chart?.result?.[0]?.meta?.regularMarketPrice;
         if(p&&p>0)return p;
       }catch(e){}
     }
@@ -1784,7 +1790,7 @@ async function fetchLivePrices(silent=false){
       s.currentPrice=Math.round(price*100)/100;
       s.updatedAt=new Date().toISOString();
       updated++;
-    }else{console.warn('all attempts failed for',sym);}
+    }else{console.warn('price failed:',sym);}
   });
   await Promise.all(fetches);
   if(updated>0){
@@ -2452,68 +2458,4 @@ function renderTxTable(){
   if(!transactions.length){tableEl.style.display='none';if(emptyEl)emptyEl.style.display='block';return;}
   tableEl.style.display='block';if(emptyEl)emptyEl.style.display='none';
   const sorted=[...transactions].reverse();
-  tableEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">DATE</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">ASSET</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">TYPE</th><th style="text-align:right;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">AMOUNT</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">NOTE</th></tr></thead><tbody>${sorted.map(tx=>{const tc={'deposit':'var(--em2)','buy':'var(--blue2)','sell':'var(--amber)','withdraw':'var(--red)','dividend':'var(--yellow)','update':'var(--text3)'}[tx.type]||'var(--text3)';return`<tr style="border-bottom:1px solid rgba(0,0,0,.05);"><td style="padding:8px 6px;color:var(--text3);">${tx.date}</td><td style="padding:8px 6px;font-weight:600;">${tx.asset}</td><td style="padding:8px 6px;"><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${tc}22;color:${tc};">${tx.type.toUpperCase()}</span></td><td style="padding:8px 6px;text-align:right;font-weight:700;">${fmtN(tx.amount)}</td><td style="padding:8px 6px;color:var(--text3);">${tx.note||'—'}</td></tr>`;}).join('')}</tbody></table>`;
-}
-
-function addTx(){
-  const date=document.getElementById('txDate').value;const assetIdx=parseInt(document.getElementById('txAsset').value);
-  const type=document.getElementById('txType').value;const amount=parseFloat(document.getElementById('txAmount').value)||0;
-  const note=document.getElementById('txNote').value.trim();
-  if(!date||!amount){toast('Please fill in date and amount');return;}
-  const names=['Krungsri Stock','AIA Insurance','TISCO PVD','Mutual Funds','Bitkub Crypto','Gold MTS'];
-  transactions.push({date,asset:names[assetIdx],type,amount,note});
-  if(type==='deposit'||type==='update')assets[assetIdx].value=amount;
-  saveAll();renderRecord();toast('Transaction saved ✓');
-}
-function clearForm(){document.getElementById('txAmount').value='';document.getElementById('txNote').value='';}
-function clearAll(){if(!confirm('Clear all transactions?'))return;transactions=[];saveAll();renderRecord();toast('Cleared');}
-
-// ══════════════ LIVE STOCK PRICES (Yahoo Finance via SET .BK) ══════════════
-async function fetchStockPrices(){
-  try{
-    const tickers=stocks.map(s=>s.ticker+'.BK').join(',');
-    const url='https://query1.finance.yahoo.com/v7/finance/quote?symbols='+tickers+'&fields=regularMarketPrice,regularMarketChangePercent,regularMarketPreviousClose';
-    const proxyUrl='https://corsproxy.io/?url='+encodeURIComponent(url);
-    const r=await fetch(proxyUrl);
-    if(!r.ok)return;
-    const data=await r.json();
-    const results=(data.quoteResponse&&data.quoteResponse.result)||[];
-    if(!results.length)return;
-    let updated=false;
-    results.forEach(q=>{
-      const ticker=q.symbol.replace('.BK','');
-      const price=q.regularMarketPrice;
-      const changePct=q.regularMarketChangePercent||0;
-      if(!price)return;
-      liveStockPrices[ticker]={price,changePct};
-      const s=stocks.find(x=>x.ticker===ticker);
-      if(s){s.currentPrice=price;updated=true;}
-    });
-    if(updated){
-      const stockTotal=Math.round(stocks.reduce((sum,s)=>sum+(s.currentPrice||s.avgCost)*s.shares,0)+cashBalance);
-      assets[0].value=stockTotal;
-      sv('inv_stocks',stocks);sv('inv_assets',assets);
-      renderDashboard();initDonut();
-      if(document.getElementById('page-stock').classList.contains('active'))renderStockPage();
-      const ts=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-      const el=document.getElementById('stockLastFetch');if(el)el.textContent='ราคาสด · '+ts;
-    }
-  }catch(e){console.warn('Stock price fetch:',e);}
-}
-
-// ══════════════ INIT ══════════════
-renderDashboard();
-setTimeout(()=>{initDonut();initLine();initAssetLine(12);},150);
-fetchPrices();
-fetchStockPrices();
-// Refresh crypto every 5 min, stocks every 5 min
-setInterval(fetchStockPrices, 5*60*1000);
-// Auto-sync on load (after a brief delay so dashboard renders first)
-setTimeout(syncFromSheets, 800);
-// Real-time polling: every 30 seconds
-setInterval(syncFromSheets, 30*1000);
-// Sync when tab becomes visible again (user switches back)
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){syncFromSheets();fetchStockPrices();fetchPrices();}});
-</script>
-</body>
-</html>
+  tableEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">DATE</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">ASSET</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">TYPE</th><th style="text-align:right;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">AMOUNT</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">NOTE</th></tr></thead><tbody>${sorted.map(tx=>{const tc={'deposit':'var(--em2)','buy':'var(--blue2)','sell':'var(--amber)','withdraw':'var(--red)','dividend':'var(--yellow)','update':'var(--text3)'}[tx.type]||'var(--text3)';return`<tr style="border-bottom:1px solid rgba(0,0,0,.05);"><td style="padding:8px 6px;color:var(--text3);">${tx.date}</td><td style="padding:8px 6px;font-weight:600;">${tx.asset}</td><td style="padding:8px 6px;"><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${tc}22;color:${tc};">${tx.type.toUpperCase()}</span></td><td style="padding:8px 6px;text-align:right;font-weig
