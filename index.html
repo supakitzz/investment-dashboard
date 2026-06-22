@@ -2466,11 +2466,11 @@ function renderTxTable(){
 renderDashboard();
 setTimeout(()=>{initDonut();initLine();initAssetLine(12);},150);
 fetchPrices();
-fetchStockPrices();
-setInterval(fetchStockPrices,5*60*1000);
+setTimeout(()=>fetchLivePrices(true),1000);
+setInterval(()=>fetchLivePrices(true),5*60*1000);
 setTimeout(syncFromSheets,800);
 setInterval(syncFromSheets,30*1000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){syncFromSheets();fetchStockPrices();fetchPrices();}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){syncFromSheets();fetchLivePrices(true);fetchPrices();}});
 </script>
 </body>
 </html>
