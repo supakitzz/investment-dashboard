@@ -1766,15 +1766,16 @@ async function fetchLivePrices(silent=false){
     return;
   }
   let updated=0;
-  // Direct Yahoo Finance — works from HTTPS origins (GitHub Pages)
+  // Yahoo Finance via corsproxy.io — works from any origin (HTTPS + file://)
   const getPrice=async sym=>{
-    const urls=[
+    const yUrls=[
       `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,
       `https://query2.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,
     ];
-    for(const url of urls){
+    for(const yUrl of yUrls){
       try{
-        const r=await fetch(url,{cache:'no-store'});
+        const proxyUrl=`https://corsproxy.io/?url=${encodeURIComponent(yUrl)}`;
+        const r=await fetch(proxyUrl,{cache:'no-store',signal:AbortSignal.timeout(8000)});
         if(!r.ok)continue;
         const data=await r.json();
         const p=data?.chart?.result?.[0]?.meta?.regularMarketPrice;
@@ -2458,4 +2459,4 @@ function renderTxTable(){
   if(!transactions.length){tableEl.style.display='none';if(emptyEl)emptyEl.style.display='block';return;}
   tableEl.style.display='block';if(emptyEl)emptyEl.style.display='none';
   const sorted=[...transactions].reverse();
-  tableEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">DATE</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">ASSET</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">TYPE</th><th style="text-align:right;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">AMOUNT</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">NOTE</th></tr></thead><tbody>${sorted.map(tx=>{const tc={'deposit':'var(--em2)','buy':'var(--blue2)','sell':'var(--amber)','withdraw':'var(--red)','dividend':'var(--yellow)','update':'var(--text3)'}[tx.type]||'var(--text3)';return`<tr style="border-bottom:1px solid rgba(0,0,0,.05);"><td style="padding:8px 6px;color:var(--text3);">${tx.date}</td><td style="padding:8px 6px;font-weight:600;">${tx.asset}</td><td style="padding:8px 6px;"><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${tc}22;color:${tc};">${tx.type.toUpperCase()}</span></td><td style="padding:8px 6px;text-align:right;font-weig
+  tableEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">DATE</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">ASSET</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">TYPE</th><th style="text-align:right;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">AMOUNT</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">NOTE</th></tr></thead><tbody>${sorted.map(tx=>{const tc={'deposit':'var(--em2)','buy':'var(--blue2)','sell':'var(--amber)','withdraw':'var(--red)','dividend':'var(--yellow)','update':'var(--text3)'}[tx.type]||'var(--text3)';return`<tr style="border-bottom:1px solid rgba(0,0,0,.05);"><td style="padding:8px 6px;color:var(--text3);">${tx.date}</td><td style="padding:8px 6px;font-weight:600;">${tx.asset}</td><td style="padding:8px 6px;"><span style="font-size:10px;font-weight:700;padding:2px 6px;border-ra
