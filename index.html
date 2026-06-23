@@ -542,8 +542,8 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
       <div class="live-dot"></div><span id="liveText">กำลังเชื่อมต่อ…</span>
     </div>
     <select class="nav-interval-sel" id="intervalSel" onchange="setRefreshInterval()">
-      <option value="60">1 min</option><option value="300" selected>5 min</option>
-      <option value="900">15 min</option><option value="1800">30 min</option>
+      <option value="60">1 min</option><option value="300">5 min</option>
+      <option value="900" selected>15 min</option><option value="1800">30 min</option>
     </select>
     <div class="nav-date" id="navDate"></div>
   </div>
@@ -1073,7 +1073,7 @@ let funds=ld('inv_funds',DEFAULT_FUNDS.map(f=>({...f})));
 let gold=ld('inv_gold',DEFAULT_GOLD.map(g=>({...g})));
 let livePrices={};
 let refreshTimer=null;
-let refreshIntervalSec=300;
+let refreshIntervalSec=900;
 let countdownTimer=null;
 let nextRefreshAt=null;
 
