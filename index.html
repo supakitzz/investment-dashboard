@@ -7,7 +7,22 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230D1B2A'/><rect x='5' y='20' width='5' height='7' rx='1.5' fill='%23F5C842'/><rect x='13' y='13' width='5' height='14' rx='1.5' fill='%23F5C842' opacity='.85'/><rect x='21' y='7' width='5' height='20' rx='1.5' fill='%23F5C842' opacity='.7'/></svg>">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/theme/mermaid.min.css" integrity="sha384-jZvDSsmGB9oGGT/4l9bHXGoAv1OxvG/cFmSo0dZaSqmBgvQTKDBFAMftlXTmMbNW" crossorigin="anonymous">
+<!-- gridjs mermaid.min.css replaced with custom dark theme -->
+<style>
+.gridjs-container{color:var(--text);background:transparent!important;}
+.gridjs-wrapper{background:transparent!important;border:1px solid var(--border)!important;border-radius:12px!important;overflow:hidden!important;box-shadow:none!important;}
+.gridjs-table{width:100%;border-collapse:collapse;background:transparent!important;}
+.gridjs-thead .gridjs-tr .gridjs-th{background:rgba(255,255,255,.04)!important;color:var(--text3);border-bottom:2px solid var(--border);padding:10px;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;font-family:'Inter',sans-serif;cursor:pointer;user-select:none;}
+.gridjs-thead .gridjs-tr .gridjs-th-sort:hover{background:rgba(255,255,255,.07)!important;}
+.gridjs-tbody .gridjs-tr{background:transparent!important;}
+.gridjs-tbody .gridjs-tr:nth-child(even) .gridjs-td{background:rgba(255,255,255,.025)!important;}
+.gridjs-tbody .gridjs-tr:hover .gridjs-td{background:rgba(255,255,255,.04)!important;}
+.gridjs-tbody .gridjs-tr .gridjs-td{background:transparent!important;color:var(--text2);border-bottom:1px solid rgba(255,255,255,.05);padding:11px 10px;font-size:12px;font-family:'Inter',sans-serif;vertical-align:middle;}
+.gridjs-sort{float:right;margin-left:4px;opacity:.5;}
+.gridjs-sort-none::after{content:'↕';font-size:10px;}
+.gridjs-sort-asc::after{content:'↑';font-size:10px;}
+.gridjs-sort-desc::after{content:'↓';font-size:10px;}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/gridjs.umd.js" integrity="sha384-/XXDzxe4FsGiAe50i/u9pY/Vy/uX654MHB1xoc1BJNnH1WXHhqHga9g3q5tF4gj7" crossorigin="anonymous"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -297,7 +312,7 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
 .gridjs-wrapper,.gridjs-container{background:transparent!important;width:100%!important;}
 .gridjs-table{background:transparent!important;width:100%!important;table-layout:auto!important;}
 .gridjs-thead .gridjs-tr th{background:rgba(255,255,255,.04)!important;color:var(--text3)!important;border-color:rgba(255,255,255,.07)!important;font-size:11px!important;font-weight:600!important;letter-spacing:.6px!important;text-transform:uppercase!important;padding:10px 10px!important;font-family:'Inter',sans-serif!important;white-space:nowrap!important;}
-.gridjs-tbody tr td{background:transparent!important;color:var(--text2)!important;border-color:rgba(255,255,255,.05)!important;font-size:12px!important;padding:11px 10px!important;font-family:'Inter',sans-serif!important;vertical-align:middle!important;}
+.gridjs-tbody .gridjs-tr{background:transparent!important;border-bottom:1px solid rgba(255,255,255,.04)!important;}.gridjs-tbody .gridjs-tr:nth-child(even){background:rgba(255,255,255,.03)!important;}.gridjs-tbody tr td{background:transparent!important;color:var(--text2)!important;border-color:rgba(255,255,255,.05)!important;font-size:12px!important;padding:11px 10px!important;font-family:'Inter',sans-serif!important;vertical-align:middle!important;}
 .gridjs-tbody tr:hover td{background:rgba(255,255,255,.04)!important;}
 .gridjs-pagination{background:transparent!important;color:var(--text3)!important;border-top:1px solid rgba(255,255,255,.07)!important;font-family:'Inter',sans-serif!important;padding:10px!important;}
 .gridjs-pagination button{background:rgba(255,255,255,.06)!important;color:var(--text2)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:8px!important;font-family:'Inter',sans-serif!important;}
@@ -322,7 +337,7 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
 /* Stock table – full width, horizontal scroll only when too narrow */
 #stockTableWrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .stock-table-wrap{width:100%;}
-.stock-table-wrap .gridjs-wrapper{border-radius:12px;overflow:hidden;width:100%!important;}
+.stock-table-wrap .gridjs-wrapper{border-radius:12px;overflow:hidden;width:100%!important;}.stock-table-wrap .gridjs-container,.stock-table-wrap .gridjs-wrapper,.stock-table-wrap .gridjs-table,.stock-table-wrap .gridjs-tbody,.stock-table-wrap .gridjs-tr,.stock-table-wrap .gridjs-td{background:transparent!important;background-color:transparent!important;box-shadow:none!important;border-color:rgba(255,255,255,.06)!important;}.stock-table-wrap .gridjs-tr:nth-child(even) .gridjs-td{background-color:rgba(255,255,255,.03)!important;}
 .stock-table-wrap .gridjs-container{width:100%!important;}
 .stock-table-wrap .gridjs-table{width:100%!important;min-width:800px;}
 
@@ -1229,7 +1244,7 @@ function renderStockGrid(){
     sort:true,
     autoWidth:false,
     pagination:false,
-  }).render(document.getElementById('stockTableWrap'));
+  }).render(document.getElementById('stockTableWrap'));setTimeout(()=>{document.querySelectorAll('#stockTableWrap .gridjs-td, #stockTableWrap .gridjs-tr, #stockTableWrap .gridjs-wrapper, #stockTableWrap .gridjs-container').forEach(el=>{el.style.setProperty('background-color','transparent','important');el.style.setProperty('background','transparent','important');});},300);
 }
 
 // ── Add / Edit Stock ──
@@ -1766,16 +1781,15 @@ async function fetchLivePrices(silent=false){
     return;
   }
   let updated=0;
-  // Yahoo Finance via corsproxy.io — works from any origin (HTTPS + file://)
+  // Direct Yahoo Finance — works from HTTPS origins (GitHub Pages)
   const getPrice=async sym=>{
-    const yUrls=[
+    const urls=[
       `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,
       `https://query2.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`,
     ];
-    for(const yUrl of yUrls){
+    for(const url of urls){
       try{
-        const proxyUrl=`https://corsproxy.io/?url=${encodeURIComponent(yUrl)}`;
-        const r=await fetch(proxyUrl,{cache:'no-store',signal:AbortSignal.timeout(8000)});
+        const r=await fetch(url,{cache:'no-store'});
         if(!r.ok)continue;
         const data=await r.json();
         const p=data?.chart?.result?.[0]?.meta?.regularMarketPrice;
@@ -2459,7 +2473,7 @@ function renderTxTable(){
   if(!transactions.length){tableEl.style.display='none';if(emptyEl)emptyEl.style.display='block';return;}
   tableEl.style.display='block';if(emptyEl)emptyEl.style.display='none';
   const sorted=[...transactions].reverse();
-  tableEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">DATE</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">ASSET</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">TYPE</th><th style="text-align:right;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">AMOUNT</th><th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:600;font-size:10px;letter-spacing:.5px;">NOTE</th></tr></thead><tbody>${sorted.map(tx=>{const tc={'deposit':'var(--em2)','buy':'var(--blue2)','sell':'var(--amber)','withdraw':'var(--red)','dividend':'var(--yellow)','update':'var(--text3)'}[tx.type]||'var(--text3)';return`<tr style="border-bottom:1px solid rgba(0,0,0,.05);"><td style="padding:8px 6px;color:var(--text3);">${tx.date}</td><td style="padding:8px 6px;font-weight:600;">${tx.asset}</td><td style="padding:8px 6px;"><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;background:\${tc}33;color:\${tc};">\${tx.type}</span></td><td style="text-align:right;padding:8px 6px;font-weight:700;">\${fmtN(tx.amount)}</td><td style="padding:8px 6px;color:var(--text3);">\${tx.note||''}</td></tr>`;}).join('')}</tbody></table>`;
+  tableEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="border-bottom:1px solid rgba(255,255,255,.1);font-size:10px;color:var(--text3);letter-spacing:.5px;"><th style="text-align:left;padding:4px 6px;">DATE</th><th style="text-align:left;padding:4px 6px;">ASSET</th><th style="text-align:left;padding:4px 6px;">TYPE</th><th style="text-align:right;padding:4px 6px;">AMOUNT</th><th style="padding:4px 6px;">NOTE</th></tr></thead><tbody>${sorted.slice(0,20).map(tx=>{const tc=tx.type==='deposit'?'var(--em2)':tx.type==='withdraw'?'var(--red)':tx.type==='dividend'?'var(--yellow)':'var(--text3)';return`<tr style="border-bottom:1px solid rgba(255,255,255,.05);"><td style="padding:8px 6px;color:var(--text3);font-size:11px;">${tx.date}</td><td style="padding:8px 6px;font-size:12px;">${tx.asset}</td><td style="padding:8px 6px;"><span style="font-size:11px;padding:2px 7px;border-radius:10px;background:${tc}33;color:${tc};">${tx.type}</span></td><td style="text-align:right;padding:8px 6px;font-weight:700;">${fmtN(tx.amount)}</td><td style="padding:8px 6px;color:var(--text3);">${tx.note||''}</td></tr>`;}).join('')}</tbody></table>`;
 }
 
 // ══════════════ INIT ══════════════
