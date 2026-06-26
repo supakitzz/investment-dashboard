@@ -95,17 +95,30 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
 .nav-date{font-size:11px;color:var(--text3);text-align:center;padding:2px 0;}
 /* Mobile: collapse to top bar */
 @media(max-width:700px){
-  .nav{position:sticky;top:0;bottom:auto;width:100%;height:52px;flex-direction:row;align-items:center;padding:0 12px;border-right:none;border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:hidden;}
+  /* ── Bottom tab bar ── */
+  .nav{position:fixed;top:auto;bottom:0;left:0;right:0;width:100%;height:58px;
+    flex-direction:row;align-items:stretch;padding:0;
+    border-right:none;border-top:1px solid var(--border);
+    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+    z-index:200;}
   .nav::-webkit-scrollbar{display:none;}
-  .nav-logo{padding:0;border-bottom:none;margin-right:8px;}
-  .nav-items{flex-direction:row;gap:0;padding:0;flex:1;overflow-x:auto;}
-  .nav-tab{height:52px;border-radius:0;padding:0 11px;font-size:12px;white-space:nowrap;}
+  .nav-logo{display:none;}
+  .nav-items{flex-direction:row;gap:0;padding:0;flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .nav-tab{
+    flex-direction:column;height:58px;border-radius:0;
+    padding:4px 6px 2px;min-width:58px;max-width:80px;flex:1;
+    font-size:9.5px;font-weight:500;gap:2px;white-space:nowrap;
+    align-items:center;justify-content:center;}
+  .nav-tab-icon{display:block!important;font-size:19px;width:auto;line-height:1.2;}
+  .nav-tab-label{font-size:9.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .nav-tab.active::before{display:none;}
-  .nav-tab.active::after{content:'';position:absolute;bottom:0;left:11px;right:11px;height:2px;background:linear-gradient(90deg,var(--em),var(--blue));border-radius:2px 2px 0 0;}
-  .nav-tab-icon{display:none;}
-  .nav-record{margin-top:0!important;border:1px solid rgba(63,168,128,.25)!important;height:28px;padding:0 10px;}
+  .nav-tab.active::after{content:'';position:absolute;top:0;left:8px;right:8px;height:2px;
+    background:linear-gradient(90deg,var(--yellow),var(--amber));border-radius:0 0 3px 3px;}
+  .nav-record{margin-top:0!important;border:none!important;background:rgba(245,200,66,.1)!important;}
   .nav-bottom{display:none;}
-  body{padding-left:0;}
+  body{padding-left:0;padding-bottom:58px;}
+  /* toast sits above the tab bar */
+  .toast{bottom:70px;}
 }
 
 /* PAGES */
@@ -424,6 +437,82 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
   .page{padding:32px 40px 60px;}
 }
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+
+/* ── DONUT CHART FLEX CONTAINER ── */
+.donut-flex-wrap{display:flex;align-items:center;gap:16px;}
+@media(max-width:560px){
+  .donut-flex-wrap{flex-direction:column;align-items:center;}
+  .donut-flex-wrap .donut-canvas-wrap{width:min(220px,65vw)!important;height:min(220px,65vw)!important;flex-shrink:1;}
+  .donut-flex-wrap .donut-canvas-wrap canvas{width:100%!important;height:100%!important;}
+}
+
+/* ── TRANSACTION TABLES HORIZONTAL SCROLL ── */
+.tx-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* ── STOCK PAGE HEADER ── */
+@media(max-width:600px){
+  #page-stock .flex-btw.mb6.fade{flex-direction:column;align-items:flex-start;gap:10px;}
+  #page-stock .flex-btw.mb6.fade > div:last-child{width:100%;justify-content:space-between;}
+}
+
+/* ── VA CALCULATOR SUMMARY ── */
+#vaSummary{display:flex;gap:12px;flex-wrap:wrap;}
+@media(max-width:500px){#vaSummary>*{flex:1 1 calc(50% - 6px);min-width:0;}}
+
+/* ── HOLDING ROW ── */
+@media(max-width:480px){
+  .holding-row{flex-wrap:wrap;}
+  .holding-qty-input{width:90px;}
+  .holding-val{min-width:70px;}
+}
+
+/* ── PVD PROJECTION CALCULATOR ── */
+@media(max-width:500px){
+  #pvdProjectionCard .form-row3{grid-template-columns:1fr 1fr;}
+}
+
+/* ── PRICE CARD ── */
+@media(max-width:400px){
+  .price-row{gap:8px;}
+  .price-coin-icon{width:30px;height:30px;font-size:13px;}
+  .price-thb{font-size:13px;}
+}
+
+/* ── CHART HEIGHTS ON MOBILE ── */
+@media(max-width:500px){
+  .chart-wrap[style*="height:280px"]{height:200px!important;}
+  .chart-wrap[style*="height:220px"]{height:180px!important;}
+  .chart-wrap[style*="height:200px"]{height:160px!important;}
+}
+
+/* ── DASHBOARD CHARTS ROW (donut + line) ── */
+#page-dashboard .dash-charts-row{display:flex;gap:16px;margin-bottom:24px;height:380px;align-items:stretch;}
+@media(max-width:700px){
+  #page-dashboard .dash-charts-row{flex-direction:column;height:auto;}
+  #page-dashboard .dash-charts-row .card:first-child{flex:none;}
+  #page-dashboard .dash-charts-row .card:first-child canvas{width:180px!important;height:180px!important;}
+  #page-dashboard .dash-charts-row .card:last-child{min-height:240px;}
+}
+
+/* ── DASHBOARD KPI STRIP ── */
+#portfolioSummaryRows{flex-wrap:wrap;}
+
+/* ── DASHBOARD SUMMARY CARD INNER (left total + right KPIs) ── */
+@media(max-width:700px){
+  #portfolioSummaryCard > .card-inner,
+  #portfolioSummaryCard [style*="flex-shrink:0;min-width:180px"]{
+    min-width:0!important;width:100%!important;border-right:none!important;
+    border-bottom:1px solid var(--border);padding-right:0!important;padding-bottom:12px!important;
+  }
+  #portfolioSummaryCard [style*="flex:1;min-width:0;display:flex;align-items:stretch"]{
+    flex-wrap:wrap;
+  }
+}
+
+/* ── ENSURE .page CONTENT IS NOT HIDDEN ON MOBILE ── */
+@media(max-width:700px){
+  .page{padding-bottom:80px;}
+}
 </style>
 </head>
 <body>
@@ -588,27 +677,74 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
   </div>
 </div>
 
+<!-- ═══════════ SETTINGS MODAL ═══════════ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">⚙ Settings</div>
+      <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+
+    <!-- Stock Price Source -->
+    <div class="modal-section" style="margin-top:0;padding-top:0;border-top:none;">📈 Stock Price Source</div>
+    <div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);border-radius:12px;padding:12px 14px;margin-bottom:14px;">
+      <div style="font-size:11.5px;color:var(--text2);line-height:1.7;">
+        <strong style="color:var(--yellow);">วิธีตั้งค่า Google Sheet ราคาหุ้น:</strong><br>
+        1. เปิด Google Sheet → สร้าง sheet ใหม่ชื่อ <code style="background:rgba(255,255,255,.1);padding:1px 5px;border-radius:4px;">Prices</code><br>
+        2. คอลัมน์ A = ชื่อ Ticker, คอลัมน์ B = สูตรราคา<br>
+        <span style="color:var(--text3);font-size:11px;">ตัวอย่าง: A1=<strong>KBANK</strong> &nbsp; B1=<strong>=GOOGLEFINANCE("BKK:KBANK","price")</strong></span><br>
+        3. Share → "Anyone with the link" → Viewer<br>
+        4. Copy URL แล้วใส่ด้านล่าง
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">GOOGLE SHEET URL</label>
+        <input class="form-input" id="priceSheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/..." style="font-size:12px;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">SHEET NAME (TAB)</label>
+        <input class="form-input" id="priceSheetNameInput" placeholder="เช่น Stock-Symbol, Prices" style="font-size:12px;">
+        <div class="form-hint">ชื่อ tab ของ Sheet (ถ้าไม่ใส่ = sheet แรก)</div>
+      </div>
+    </div>
+    <div class="form-hint" id="priceSheetHint" style="margin-top:-8px;margin-bottom:10px;">กด Test เพื่อทดสอบการเชื่อมต่อ — ราคาต้องอยู่คอลัมน์ใดคอลัมน์หนึ่ง (ตรวจจับอัตโนมัติ)</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-ghost btn-sm" id="testSheetBtn" onclick="testPriceSheet()">🔍 Test Connection</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearPriceSheet()" style="color:var(--red);">✕ Clear</button>
+    </div>
+    <div id="testSheetResult" style="display:none;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text2);margin-bottom:14px;max-height:140px;overflow-y:auto;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn btn-primary" onclick="savePriceSheetSettings()" style="flex:1;">💾 Save Settings</button>
+      <button class="btn btn-ghost" onclick="closeModal('settingsModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo"><div class="nav-logo-icon">📈</div><div class="nav-logo-text">InvestTrack</div></div>
   <div class="nav-items">
-    <button class="nav-tab active" onclick="showPage('dashboard',this)"><span class="nav-tab-icon">🏠</span>Dashboard</button>
-    <button class="nav-tab" onclick="showPage('stock',this)"><span class="nav-tab-icon">📊</span>Stocks</button>
-    <button class="nav-tab" onclick="showPage('crypto',this)"><span class="nav-tab-icon">₿</span>Crypto</button>
-    <button class="nav-tab" onclick="showPage('pvd',this)"><span class="nav-tab-icon">🏦</span>Provident Fund</button>
-    <button class="nav-tab" onclick="showPage('insurance',this)"><span class="nav-tab-icon">🛡️</span>Insurance</button>
-    <button class="nav-tab" onclick="showPage('funds',this)"><span class="nav-tab-icon">📁</span>Funds</button>
-    <button class="nav-tab" onclick="showPage('gold',this)"><span class="nav-tab-icon">🥇</span>Gold</button>
-    <button class="nav-tab nav-record" onclick="showPage('record',this)"><span class="nav-tab-icon">✚</span>Record</button>
+    <button class="nav-tab active" onclick="showPage('dashboard',this)"><span class="nav-tab-icon">🏠</span><span class="nav-tab-label">Dashboard</span></button>
+    <button class="nav-tab" onclick="showPage('stock',this)"><span class="nav-tab-icon">📊</span><span class="nav-tab-label">Stocks</span></button>
+    <button class="nav-tab" onclick="showPage('crypto',this)"><span class="nav-tab-icon">₿</span><span class="nav-tab-label">Crypto</span></button>
+    <button class="nav-tab" onclick="showPage('pvd',this)"><span class="nav-tab-icon">🏦</span><span class="nav-tab-label">PVD</span></button>
+    <button class="nav-tab" onclick="showPage('insurance',this)"><span class="nav-tab-icon">🛡️</span><span class="nav-tab-label">Insurance</span></button>
+    <button class="nav-tab" onclick="showPage('funds',this)"><span class="nav-tab-icon">📁</span><span class="nav-tab-label">Funds</span></button>
+    <button class="nav-tab" onclick="showPage('gold',this)"><span class="nav-tab-icon">🥇</span><span class="nav-tab-label">Gold</span></button>
+    <button class="nav-tab nav-record" onclick="showPage('record',this)"><span class="nav-tab-icon">✚</span><span class="nav-tab-label">Record</span></button>
   </div>
   <div class="nav-bottom">
     <div class="live-badge loading" id="liveBadge" onclick="fetchPrices()" title="คลิกเพื่ออัปเดตราคา crypto">
       <div class="live-dot"></div><span id="liveText">กำลังเชื่อมต่อ…</span>
     </div>
     <div style="font-size:10px;color:var(--text3);line-height:1.7;padding:4px 2px;">
-      <div>📈 หุ้นไทย · Yahoo Finance</div>
+      <div id="stockPriceSourceLabel">📈 หุ้นไทย · Yahoo Finance</div>
       <div>₿ Crypto · CoinGecko</div>
     </div>
+    <button onclick="openSettingsModal()" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;width:100%;text-align:left;transition:all .18s;" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">⚙ Settings</button>
   </div>
 </nav>
 
@@ -640,7 +776,7 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
   </div>
 
   <!-- ── Charts row: Donut + Line ── -->
-  <div style="display:flex;gap:16px;margin-bottom:24px;height:380px;align-items:stretch;">
+  <div class="dash-charts-row" style="display:flex;gap:16px;margin-bottom:24px;height:380px;align-items:stretch;">
     <!-- Donut -->
     <div class="card" style="flex:0 0 300px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
       <div class="label mb4" style="align-self:flex-start;">Asset Allocation</div>
@@ -790,8 +926,8 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
   <div class="g2 mb4">
     <div class="card">
       <div class="label mb4">Sector Allocation</div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        <div style="position:relative;flex-shrink:0;width:240px;height:240px;">
+      <div class="donut-flex-wrap">
+        <div class="donut-canvas-wrap" style="position:relative;flex-shrink:0;width:240px;height:240px;">
           <canvas id="sectorDonut"></canvas>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
             <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;">Total</div>
@@ -818,7 +954,7 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
           onchange="renderVACalc()">
       </div>
     </div>
-    <div style="display:flex;gap:12px;margin-bottom:16px;" id="vaSummary"></div>
+    <div style="margin-bottom:16px;" id="vaSummary"></div>
     <div id="vaTable"></div>
   </div>
   <!-- Stock Heatmap -->
@@ -868,8 +1004,8 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
   <div class="g2 mb4">
     <div class="card">
       <div class="label mb4">Coin Distribution</div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        <div style="position:relative;flex-shrink:0;width:288px;height:288px;">
+      <div class="donut-flex-wrap">
+        <div class="donut-canvas-wrap" style="position:relative;flex-shrink:0;width:288px;height:288px;">
           <canvas id="cryptoDonut"></canvas>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
             <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;">Total</div>
@@ -939,6 +1075,43 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
     <div class="card card-sm"><div class="label mb4">Asset Allocation</div><div class="chart-wrap" style="height:190px;"><canvas id="pvdDonut"></canvas></div></div>
   </div>
   <div class="card mb4"><div class="label mb4">Value History — 12 Months</div><div class="chart-wrap" style="height:190px;"><canvas id="pvdLine"></canvas></div></div>
+
+  <!-- ── PVD Cumulative Growth ── -->
+  <div class="card mb4">
+    <div class="label mb4">📈 Cumulative Contribution Growth</div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="pvdGrowthLine"></canvas></div>
+  </div>
+
+  <!-- ── PVD Retirement Projection ── -->
+  <div class="card mb4" id="pvdProjectionCard">
+    <div class="flex-btw mb4">
+      <div class="label" style="margin:0;">🎯 Retirement Projection</div>
+      <span style="font-size:11px;color:var(--text3);">ปรับค่าได้</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:140px;">
+        <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">เงินสมทบ/เดือน (฿)</label>
+        <input id="pvpMonthly" type="number" value="8000" min="0" step="500"
+          style="background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px;font-weight:700;font-family:'Inter',sans-serif;outline:none;width:130px;"
+          oninput="renderPvdProjection()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:140px;">
+        <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">ปีที่เหลือถึงเกษียณ</label>
+        <input id="pvpYears" type="number" value="25" min="1" max="40" step="1"
+          style="background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px;font-weight:700;font-family:'Inter',sans-serif;outline:none;width:130px;"
+          oninput="renderPvdProjection()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:140px;">
+        <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">ผลตอบแทนต่อปี (%)</label>
+        <input id="pvpRate" type="number" value="5" min="1" max="15" step="0.5"
+          style="background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px;font-weight:700;font-family:'Inter',sans-serif;outline:none;width:130px;"
+          oninput="renderPvdProjection()">
+      </div>
+    </div>
+    <div id="pvdProjectionResult" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
+    <div class="chart-wrap" style="height:200px;"><canvas id="pvdProjectionChart"></canvas></div>
+  </div>
+
   <!-- ── PVD Contributions Table ── -->
   <div class="card">
     <div class="label mb4">CONTRIBUTION BREAKDOWN</div>
@@ -971,7 +1144,14 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
     </div>
     <button class="btn btn-ghost btn-sm" onclick="openModal(1)">✏ Edit</button>
   </div>
-  <div class="card mb4"><div class="label mb4">Value Comparison</div><div class="chart-wrap" style="height:190px;"><canvas id="insBar"></canvas></div></div>
+  <div class="g2 mb4">
+    <div class="card"><div class="label mb4">Value Comparison</div><div class="chart-wrap" style="height:190px;"><canvas id="insBar"></canvas></div></div>
+    <div class="card"><div class="label mb4">Sum Assured vs Cash Value</div><div class="chart-wrap" style="height:190px;"><canvas id="insCvBar"></canvas></div></div>
+  </div>
+  <div class="card mb4">
+    <div class="label mb4">💰 Premium Paid vs Cash Value Growth</div>
+    <div class="chart-wrap" style="height:210px;"><canvas id="insPremiumLine"></canvas></div>
+  </div>
   <div class="card mb4"><div class="label mb4">Group Allocation</div><div id="insAllocList"></div></div>
   <!-- ── AIA Policies Table ── -->
   <div class="card">
@@ -1122,13 +1302,19 @@ let donutChart=null;
 let lineChart=null;
 let pvdDonut=null;
 let pvdLine=null;
+let pvdGrowthChart=null;
+let pvdProjectionChart=null;
 let sectorChart=null;
 let returnBarChart=null;
 let cryptoDonut=null;
 let cryptoPnlBar=null;
 let insBarChart=null;
+let insCvBarChart=null;
+let insPremiumLineChart=null;
 let vaChart=null;
 let _livePriceTimer=null;
+let _priceSheetUrl=localStorage.getItem('_priceSheetUrl')||'https://docs.google.com/spreadsheets/d/1qXbouGEvu-LpwzoUO5PonamX1QiaA9sYekvFmP1C5Ao/edit?usp=sharing';
+let _priceSheetName=localStorage.getItem('_priceSheetName')||'Stock-Symbol';
 
 // ══════════════ DATA ══════════════
 const DEFAULTS=[
@@ -1244,8 +1430,8 @@ function showPage(id,btn){
   if(id==='record')renderRecord();
   if(id==='stock')renderStockPage();
   if(id==='crypto'){renderHoldingsInputs();renderCrypto24h();renderCryptoTable();renderCryptoHeatmap();_cryptoTxPage=0;_cryptoTxFilterType='';_cryptoTxFilterSym='';renderCryptoTxTable(0,'','');}
-  if(id==='pvd')renderPvdTable();
-  if(id==='insurance')renderInsuranceTables();
+  if(id==='pvd'){renderPvdTable();renderPageTx('TISCO PVD','pvdPageTx');}
+  if(id==='insurance'){renderInsuranceTables();renderPageTx('AIA Insurance','insPageTx');}
   if(id==='funds')renderFundsPage();
   if(id==='gold')renderGoldPage();
 }
@@ -1557,7 +1743,8 @@ function renderCryptoTxTable(page=0,filterType,filterSym){
   ).join('');
   el.innerHTML=`
     ${filterBar}
-    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+    <div class="tx-table-scroll">
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;min-width:560px;">
       <colgroup>
         <col style="width:80px;"><col style="width:75px;"><col style="width:75px;">
         <col style="width:80px;"><col style="width:85px;"><col style="width:100px;"><col style="width:105px;">
@@ -1575,13 +1762,14 @@ function renderCryptoTxTable(page=0,filterType,filterSym){
       </thead>
     </table>
     <div style="overflow-y:auto;max-height:420px;">
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;min-width:560px;">
         <colgroup>
           <col style="width:80px;"><col style="width:75px;"><col style="width:75px;">
           <col style="width:80px;"><col style="width:85px;"><col style="width:100px;"><col style="width:105px;">
         </colgroup>
         <tbody>${rows}</tbody>
       </table>
+    </div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:10px 10px 0;border-top:1px solid var(--border);margin-top:4px;">
       <button onclick="renderCryptoTxTable(${_cryptoTxPage-1})" style="${prevDisabled}background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;">←</button>
@@ -1821,6 +2009,192 @@ function renderCryptoTable(){
     ],
     data:rows,search:false,sort:true,autoWidth:false,
   }).render(wrap);
+}
+
+// ══════════════ PVD CHARTS ══════════════
+
+function initPvdGrowthLine(){
+  const ctx=document.getElementById('pvdGrowthLine');if(!ctx)return;
+  if(pvdGrowthChart){pvdGrowthChart.destroy();pvdGrowthChart=null;}
+  // build monthly cumulative from PVD transactions
+  const pvdTx=[...transactions]
+    .filter(tx=>tx.asset==='TISCO PVD'&&(tx.type==='deposit'||tx.type==='update'))
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  if(!pvdTx.length)return;
+  // monthly buckets
+  const monthly={};
+  pvdTx.forEach(tx=>{
+    const ym=tx.date.substring(0,7);
+    monthly[ym]=(monthly[ym]||0)+(tx.type==='deposit'?tx.amount:0);
+  });
+  const months=Object.keys(monthly).sort();
+  let running=0;
+  const labels=[];const data=[];
+  months.forEach(ym=>{
+    running+=monthly[ym];
+    labels.push(ym.replace('-','/'));
+    data.push(Math.round(running));
+  });
+  // add current value as last point
+  const curVal=assets[2].value;
+  if(data.length&&curVal>data[data.length-1]){
+    const now=new Date();
+    labels.push(`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}`);
+    data.push(Math.round(curVal));
+  }
+  pvdGrowthChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'Cumulative Value (฿)',
+        data,
+        borderColor:'#10b981',
+        backgroundColor:'rgba(16,185,129,.12)',
+        borderWidth:2.5,
+        fill:true,
+        tension:0.35,
+        pointRadius:data.length>24?0:3,
+        pointHoverRadius:5,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ฿'+Math.round(c.raw).toLocaleString('en-US')}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{size:10},maxTicksLimit:12},grid:{display:false}},
+        y:{ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.04)'}},
+      }
+    }
+  });
+}
+
+function renderPvdProjection(){
+  const monthly=parseFloat(document.getElementById('pvpMonthly')?.value)||8000;
+  const years=parseFloat(document.getElementById('pvpYears')?.value)||25;
+  const rate=parseFloat(document.getElementById('pvpRate')?.value)||5;
+  const curVal=assets[2].value||268184;
+  const r=rate/100/12;
+  const n=years*12;
+  // FV = PV*(1+r)^n + PMT*((1+r)^n - 1)/r
+  const fv=curVal*Math.pow(1+r,n)+monthly*(Math.pow(1+r,n)-1)/r;
+  const totalContrib=curVal+monthly*n;
+  const growth=fv-totalContrib;
+  // result cards
+  const resEl=document.getElementById('pvdProjectionResult');
+  if(resEl)resEl.innerHTML=`
+    <div style="flex:1;min-width:140px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">มูลค่าเมื่อเกษียณ</div>
+      <div style="font-size:20px;font-weight:800;color:var(--em2);">฿${Math.round(fv).toLocaleString('en-US')}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">เงินสมทบรวม</div>
+      <div style="font-size:20px;font-weight:800;color:var(--blue2);">฿${Math.round(totalContrib).toLocaleString('en-US')}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">ผลตอบแทนสะสม</div>
+      <div style="font-size:20px;font-weight:800;color:var(--yellow);">฿${Math.round(growth).toLocaleString('en-US')}</div>
+    </div>`;
+  // projection chart
+  const ctx=document.getElementById('pvdProjectionChart');if(!ctx)return;
+  if(pvdProjectionChart){pvdProjectionChart.destroy();pvdProjectionChart=null;}
+  const labels=[],contribData=[],totalData=[];
+  const step=Math.max(1,Math.floor(years/20));
+  for(let y=0;y<=years;y+=step){
+    const ni=y*12;
+    const fvi=curVal*Math.pow(1+r,ni)+monthly*(Math.pow(1+r,ni)-1)/r;
+    const ci=curVal+monthly*ni;
+    labels.push(`+${y}ปี`);
+    contribData.push(Math.round(ci));
+    totalData.push(Math.round(fvi));
+  }
+  pvdProjectionChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'มูลค่ารวม (FV)',data:totalData,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.15)',fill:true,tension:0.35,borderWidth:2.5,pointRadius:3},
+        {label:'เงินสมทบ',data:contribData,borderColor:'#60a5fa',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:0.1,borderWidth:1.5,borderDash:[5,3],pointRadius:0},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ฿`+Math.round(c.raw).toLocaleString('en-US')}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.04)'}},
+      }
+    }
+  });
+}
+
+// ══════════════ INSURANCE CHARTS ══════════════
+
+function initInsCvBar(){
+  const ctx=document.getElementById('insCvBar');if(!ctx)return;
+  if(insCvBarChart){insCvBarChart.destroy();insCvBarChart=null;}
+  const labels=insurance.map(p=>p.name.length>12?p.name.substring(0,12)+'…':p.name);
+  const saData=insurance.map(p=>p.sumAssured);
+  const cvData=insurance.map(p=>p.surrenderValue);
+  insCvBarChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Sum Assured',data:saData,backgroundColor:'rgba(96,165,250,.25)',borderColor:'#60a5fa',borderWidth:1.5,borderRadius:4},
+        {label:'Cash Value',data:cvData,backgroundColor:'rgba(16,185,129,.35)',borderColor:'#10b981',borderWidth:1.5,borderRadius:4},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ฿`+Math.round(c.raw).toLocaleString('en-US')}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.04)'}},
+      }
+    }
+  });
+}
+
+function initInsPremiumLine(){
+  const ctx=document.getElementById('insPremiumLine');if(!ctx)return;
+  if(insPremiumLineChart){insPremiumLineChart.destroy();insPremiumLineChart=null;}
+  const insTx=[...transactions]
+    .filter(tx=>tx.asset==='AIA Insurance'&&tx.type==='deposit')
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  if(!insTx.length)return;
+  const monthly={};
+  insTx.forEach(tx=>{const ym=tx.date.substring(0,7);monthly[ym]=(monthly[ym]||0)+tx.amount;});
+  const months=Object.keys(monthly).sort();
+  let running=0;
+  const labels=[];const premData=[];
+  months.forEach(ym=>{
+    running+=monthly[ym];
+    labels.push(ym.replace('-','/'));
+    premData.push(Math.round(running));
+  });
+  const totalCash=insurance.reduce((s,p)=>s+p.surrenderValue,0);
+  // cash value line — only have current point, interpolate linearly from 0
+  const cvData=labels.map((_,i)=>Math.round(totalCash*(i+1)/labels.length));
+  cvData[cvData.length-1]=totalCash;
+  insPremiumLineChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Premium Paid (cumulative)',data:premData,borderColor:'#a78bfa',backgroundColor:'rgba(139,92,246,.12)',fill:true,tension:0.3,borderWidth:2.5,pointRadius:premData.length>24?0:3},
+        {label:'Cash Value',data:cvData,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:0.3,borderWidth:2,borderDash:[6,3],pointRadius:0},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ฿`+Math.round(c.raw).toLocaleString('en-US')}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{size:10},maxTicksLimit:12},grid:{display:false}},
+        y:{ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.04)'}},
+      }
+    }
+  });
 }
 
 // ══════════════ PVD TABLE ══════════════
@@ -2234,7 +2608,8 @@ function renderStockTxPaged(page=0,filterType,filterSym){
   ).join('');
   el.innerHTML=`
     ${filterBar}
-    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+    <div class="tx-table-scroll">
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;min-width:480px;">
       <colgroup>
         <col style="width:85px;"><col style="width:80px;"><col style="width:100px;">
         <col style="width:75px;"><col style="width:105px;"><col style="width:115px;">
@@ -2251,13 +2626,14 @@ function renderStockTxPaged(page=0,filterType,filterSym){
       </thead>
     </table>
     <div style="overflow-y:auto;max-height:420px;">
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;min-width:480px;">
         <colgroup>
           <col style="width:85px;"><col style="width:80px;"><col style="width:100px;">
           <col style="width:75px;"><col style="width:105px;"><col style="width:115px;">
         </colgroup>
         <tbody>${rows}</tbody>
       </table>
+    </div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:10px 10px 0;border-top:1px solid var(--border);margin-top:4px;">
       <button onclick="renderStockTxPaged(${_stockTxPage-1})" style="${prevDisabled}background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;">←</button>
@@ -2319,13 +2695,11 @@ function renderPageTx(assetName, elId, limit=50){
 function renderCharts(id){
   if(id==='dashboard'){renderDashboard();setTimeout(()=>{initDonut();initLine();initAssetLine(12);},120);setTimeout(()=>fetchLivePrices(true),500);}
   if(id==='crypto')setTimeout(()=>{initCryptoDonut();},120);
-  if(id==='pvd')setTimeout(()=>{initPvdDonut();initPvdLine();},120);
-  if(id==='insurance'){renderInsuranceTables();setTimeout(initInsBar,120);}
+  if(id==='pvd')setTimeout(()=>{initPvdDonut();initPvdLine();initPvdGrowthLine();renderPvdProjection();},120);
+  if(id==='insurance'){renderInsuranceTables();setTimeout(()=>{initInsBar();initInsCvBar();initInsPremiumLine();},120);}
   if(id==='funds')renderFundsPage();
   if(id==='gold')renderGoldPage();
   if(id==='stock'){setTimeout(()=>{initSectorDonut();initReturnBar();},120);renderVACalc();renderStockHeatmap();startLivePriceAutoUpdate();_stockTxPage=0;renderStockTxPaged(0);}
-  if(id==='pvd')renderPageTx('TISCO PVD','pvdPageTx');
-  if(id==='insurance')renderPageTx('AIA Insurance','insPageTx');
   if(id==='funds')renderPageTx('Mutual Funds','fundsPageTx');
   if(id==='gold')renderPageTx('Gold MTS','goldPageTx');
 }
@@ -2422,59 +2796,318 @@ function _computeSnapshots(txs){
   return snaps;
 }
 
+// ── GOOGLE SHEET PRICE FEED ──────────────────────────────────────
+
+// JSONP fetch — works from file:// protocol (no CORS restriction via <script> tag)
+function fetchGvizJSONP(sheetId, sheetName){
+  return new Promise(resolve=>{
+    const cb='_gvizCb'+Date.now();
+    const timer=setTimeout(()=>{delete window[cb];if(script.parentNode)script.remove();resolve(null);},9000);
+    window[cb]=function(resp){
+      clearTimeout(timer);delete window[cb];if(script.parentNode)script.remove();
+      try{
+        const rows=resp.table.rows;
+        const cols=resp.table.cols;
+        // find price column by label
+        let priceIdx=-1;
+        for(let i=cols.length-1;i>=1;i--){
+          const lbl=(cols[i].label||'').toLowerCase();
+          if(lbl.includes('price')||lbl.includes('ราคา')){priceIdx=i;break;}
+        }
+        const map={};
+        for(const row of rows){
+          if(!row.c||!row.c[0])continue;
+          const ticker=String(row.c[0].v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+          if(!ticker||ticker.length<1||ticker.length>10)continue;
+          let price=null;
+          const tryCell=cell=>{
+            if(!cell)return null;
+            if(typeof cell.v==='number'&&cell.v>0)return cell.v;
+            const s=cell.f||String(cell.v||'');
+            const v=parseFloat(s.replace(/[฿,\s]/g,''));
+            return(!isNaN(v)&&v>0)?v:null;
+          };
+          if(priceIdx>=1)price=tryCell(row.c[priceIdx]);
+          if(price===null){
+            for(let j=(row.c.length||0)-1;j>=1;j--){
+              const p=tryCell(row.c[j]);
+              if(p!==null){price=p;break;}
+            }
+          }
+          if(price!==null)map[ticker]=Math.round(price*100)/100;
+        }
+        resolve(Object.keys(map).length>0?map:null);
+      }catch(e){resolve(null);}
+    };
+    const script=document.createElement('script');
+    script.onerror=()=>{clearTimeout(timer);delete window[cb];resolve(null);};
+    script.src=`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json;responseHandler:${cb}&sheet=${encodeURIComponent(sheetName)}`;
+    document.head.appendChild(script);
+  });
+}
+
+async function fetchPricesFromSheet(sheetUrl, sheetName=''){
+  const m=sheetUrl.match(/\/spreadsheets\/d\/([^/?#]+)/);
+  if(!m)return null;
+  const id=m[1];
+
+  // PRIMARY: JSONP — works from file:// and all origins (no CORS)
+  try{
+    const result=await fetchGvizJSONP(id,sheetName);
+    if(result&&Object.keys(result).length>0)return result;
+  }catch(e){}
+
+  // FALLBACK: direct fetch (works when served from HTTPS)
+  const gvizUrl=sheetToGviz(sheetUrl,sheetName);
+  const csvUrl=sheetToCSV(sheetUrl,sheetName);
+  const proxies=[
+    gvizUrl,
+    csvUrl,
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(gvizUrl),
+    'https://thingproxy.freeboard.io/fetch/'+gvizUrl,
+  ];
+  for(const url of proxies){
+    try{
+      const r=await fetch(url,{cache:'no-store'});
+      if(!r.ok)continue;
+      const text=await r.text();
+      if(!text||text.length<10)continue;
+      if(text.trimStart().startsWith('<html')||text.trimStart().startsWith('<!'))continue;
+      const result=parsePriceCSV(text);
+      if(result&&Object.keys(result).length>0)return result;
+    }catch(e){}
+  }
+  return null;
+}
+
+function sheetToGviz(url, sheetName=''){
+  const m=url.match(/\/spreadsheets\/d\/([^/?#]+)/);
+  if(!m)return '';
+  const id=m[1];
+  const sheet=sheetName?`&sheet=${encodeURIComponent(sheetName)}`:'';
+  return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv${sheet}`;
+}
+
+function sheetToCSV(url, sheetName=''){
+  const m=url.match(/\/spreadsheets\/d\/([^/?#]+)/);
+  if(!m)return url;
+  const id=m[1];
+  if(sheetName){
+    return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&sheet=${encodeURIComponent(sheetName)}`;
+  }
+  // Fallback: use gid from URL (handles tab anchors like #gid=123)
+  const gidM=url.match(/[?&#]gid=(\d+)/);
+  const gid=gidM?gidM[1]:'0';
+  return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
+}
+
+function parsePriceCSV(text){
+  const map={};
+  const rows=text.split('\n').map(r=>r.trim()).filter(r=>r);
+  if(!rows.length)return null;
+
+  // Parse a CSV row respecting quoted fields
+  const splitRow=row=>{
+    const cols=[];let cur='';let inQ=false;
+    for(let i=0;i<row.length;i++){
+      const c=row[i];
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
+      else{cur+=c;}
+    }
+    cols.push(cur.trim());
+    return cols.map(c=>c.replace(/^"|"$/g,'').trim());
+  };
+
+  // Detect header row (first row has non-numeric ticker-like values only)
+  let startRow=0;
+  const firstCols=splitRow(rows[0]);
+  const firstTicker=(firstCols[0]||'').toLowerCase();
+  if(firstTicker==='symbol'||firstTicker==='ticker'||firstTicker==='stock'||firstTicker==='หุ้น'){
+    startRow=1;
+  }
+
+  // Auto-detect price column index from header or data
+  let priceColIdx=-1;
+  if(startRow===1){
+    // Look for header named "price" / "current price" / "ราคา"
+    for(let i=firstCols.length-1;i>=1;i--){
+      const h=firstCols[i].toLowerCase();
+      if(h.includes('price')||h.includes('ราคา')){priceColIdx=i;break;}
+    }
+  }
+
+  for(let i=startRow;i<rows.length;i++){
+    const cols=splitRow(rows[i]);
+    const ticker=(cols[0]||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(!ticker||ticker.length<1||ticker.length>10)continue;
+
+    let price=null;
+    if(priceColIdx>=1&&cols[priceColIdx]){
+      // Use detected column
+      const raw=cols[priceColIdx].replace(/[฿,\s]/g,'');
+      const val=parseFloat(raw);
+      if(!isNaN(val)&&val>0)price=val;
+    }
+    if(price===null){
+      // Fallback: scan all columns right-to-left for a valid price
+      for(let j=cols.length-1;j>=1;j--){
+        const raw=cols[j].replace(/[฿,\s]/g,'');
+        const val=parseFloat(raw);
+        if(!isNaN(val)&&val>0){price=val;break;}
+      }
+    }
+    if(price!==null)map[ticker]=price;
+  }
+  return Object.keys(map).length>0?map:null;
+}
+
+function updateStockPriceSourceLabel(source){
+  const el=document.getElementById('stockPriceSourceLabel');
+  if(el)el.textContent=source==='sheet'?'📈 หุ้นไทย · Google Sheet':'📈 หุ้นไทย · Yahoo Finance';
+}
+
 async function fetchLivePrices(silent=false){
   const btn=document.getElementById('livePriceBtn');
   const label=document.getElementById('priceSourceLabel');
   if(!silent&&btn){btn.disabled=true;btn.textContent='⟳ Fetching…';}
   let updated=0;
-  // Yahoo Finance via CORS proxy — works from HTTP localhost and HTTPS
-  const getPrice=async sym=>{
-    const yahooUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`;
-    const urls=[
-      'https://corsproxy.io/?url='+encodeURIComponent(yahooUrl),
-      'https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d&range=1d',
-    ];
-    for(const url of urls){
-      try{
-        const r=await fetch(url,{cache:'no-store'});
-        if(!r.ok)continue;
-        const data=await r.json();
-        const p=data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-        if(p&&p>0)return p;
-      }catch(e){}
+  let source='yahoo';
+
+  // ── PRIMARY: Google Sheet (if configured) ──
+  if(_priceSheetUrl){
+    const priceMap=await fetchPricesFromSheet(_priceSheetUrl,_priceSheetName);
+    if(priceMap){
+      stocks.forEach(s=>{
+        const p=priceMap[s.ticker.toUpperCase()];
+        if(p&&p>0){s.currentPrice=Math.round(p*100)/100;s.updatedAt=new Date().toISOString();updated++;}
+      });
+      source='sheet';
     }
-    return null;
-  };
-  const fetches=stocks.map(async s=>{
-    const sym=s.ticker+'.BK';
-    const price=await getPrice(sym);
-    if(price){
-      s.currentPrice=Math.round(price*100)/100;
-      s.updatedAt=new Date().toISOString();
-      updated++;
-    }else{console.warn('price failed:',sym);}
-  });
-  await Promise.all(fetches);
+  }
+
+  // ── FALLBACK: Yahoo Finance via CORS proxy ──
+  if(updated===0){
+    const getYahooPrice=async sym=>{
+      const yahooUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`;
+      const urls=[
+        'https://corsproxy.io/?url='+encodeURIComponent(yahooUrl),
+        'https://api.allorigins.win/raw?url='+encodeURIComponent(yahooUrl),
+        yahooUrl,
+      ];
+      for(const url of urls){
+        try{
+          const r=await fetch(url,{cache:'no-store'});
+          if(!r.ok)continue;
+          const data=await r.json();
+          const p=data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+          if(p&&p>0)return p;
+        }catch(e){}
+      }
+      return null;
+    };
+    const fetches=stocks.map(async s=>{
+      const p=await getYahooPrice(s.ticker+'.BK');
+      if(p){s.currentPrice=Math.round(p*100)/100;s.updatedAt=new Date().toISOString();updated++;}
+    });
+    await Promise.all(fetches);
+    source='yahoo';
+  }
+
+  // ── Result ──
   if(updated>0){
     saveAll();
     renderDashboard();
     if(document.getElementById('page-stock')?.classList.contains('active')){renderStockPage();renderStockHeatmap();}
     const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
     if(label)label.textContent=`⚡ Live · อัปเดต ${now}`;
-    if(!silent)showToast(`✓ อัปเดตราคาหุ้น ${updated} ตัวแล้ว`);
+    updateStockPriceSourceLabel(source);
+    if(!silent)showToast(`✓ อัปเดตราคาหุ้น ${updated} ตัว (${source==='sheet'?'Google Sheet':'Yahoo Finance'})`);
   }else{
-    if(label)label.textContent='Manual updates';
-    if(!silent)showToast('⚠ ดึงราคาไม่ได้ — ตรวจสอบ internet หรือ VPN');
+    if(label)label.textContent='ดึงราคาไม่ได้';
+    if(!silent){
+      const hint=_priceSheetUrl?'ตรวจสอบ Sheet URL ใน Settings':'ตั้งค่า Google Sheet ใน ⚙ Settings';
+      showToast(`⚠ ดึงราคาไม่ได้ — ${hint}`);
+    }
   }
   if(!silent&&btn){btn.disabled=false;btn.textContent='⚡ Live Prices';}
 }
 
 function startLivePriceAutoUpdate(){
-  fetchLivePrices(false);
+  fetchLivePrices(false); // non-silent so user sees result
   if(_livePriceTimer)clearInterval(_livePriceTimer);
   _livePriceTimer=setInterval(()=>fetchLivePrices(true),5*60*1000);
   const label=document.getElementById('priceSourceLabel');
   if(label)label.textContent='⚡ Live · กำลังโหลด…';
+  updateStockPriceSourceLabel(_priceSheetUrl?'sheet':'yahoo');
+}
+
+// ── SETTINGS MODAL ────────────────────────────────────────────────
+function openSettingsModal(){
+  const urlInp=document.getElementById('priceSheetUrlInput');
+  const nameInp=document.getElementById('priceSheetNameInput');
+  if(urlInp)urlInp.value=_priceSheetUrl||'';
+  if(nameInp)nameInp.value=_priceSheetName||'';
+  const result=document.getElementById('testSheetResult');
+  if(result)result.style.display='none';
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function savePriceSheetSettings(){
+  const url=(document.getElementById('priceSheetUrlInput')?.value||'').trim();
+  const name=(document.getElementById('priceSheetNameInput')?.value||'').trim();
+  _priceSheetUrl=url;
+  _priceSheetName=name;
+  if(url){localStorage.setItem('_priceSheetUrl',url);}else{localStorage.removeItem('_priceSheetUrl');}
+  if(name){localStorage.setItem('_priceSheetName',name);}else{localStorage.removeItem('_priceSheetName');}
+  updateStockPriceSourceLabel(url?'sheet':'yahoo');
+  closeModal('settingsModal');
+  showToast(url?`✓ บันทึกแล้ว${name?' ('+name+')':''}`:' ✓ ล้าง Price Sheet แล้ว');
+  if(url)fetchLivePrices(false);
+}
+
+function clearPriceSheet(){
+  const urlInp=document.getElementById('priceSheetUrlInput');
+  const nameInp=document.getElementById('priceSheetNameInput');
+  if(urlInp)urlInp.value='';
+  if(nameInp)nameInp.value='';
+  const result=document.getElementById('testSheetResult');
+  if(result)result.style.display='none';
+}
+
+async function testPriceSheet(){
+  const url=(document.getElementById('priceSheetUrlInput')?.value||'').trim();
+  const name=(document.getElementById('priceSheetNameInput')?.value||'').trim();
+  const result=document.getElementById('testSheetResult');
+  const btn=document.getElementById('testSheetBtn');
+  const hint=document.getElementById('priceSheetHint');
+  if(!url){if(hint)hint.textContent='⚠ กรุณาใส่ URL ก่อน';return;}
+  if(btn){btn.disabled=true;btn.textContent='⟳ Testing…';}
+  if(result)result.style.display='none';
+  const priceMap=await fetchPricesFromSheet(url,name);
+  if(btn){btn.disabled=false;btn.textContent='🔍 Test Connection';}
+  if(priceMap){
+    const entries=Object.entries(priceMap);
+    const rows=entries.slice(0,12).map(([t,p])=>
+      `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span style="color:var(--text3);">${t}</span>
+        <span style="font-weight:600;color:var(--em2);">฿${p.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>`).join('');
+    const more=entries.length>12?`<div style="color:var(--text3);font-size:11px;margin-top:6px;">...และอีก ${entries.length-12} ตัว</div>`:'';
+    result.innerHTML=`<div style="color:var(--em2);font-weight:600;margin-bottom:8px;">✓ เชื่อมต่อสำเร็จ — พบ ${entries.length} ticker</div>${rows}${more}`;
+    result.style.display='block';
+    if(hint)hint.textContent=`✓ พบ ${entries.length} ticker — กด Save Settings เพื่อใช้งาน`;
+  }else{
+    result.innerHTML=`<div style="color:var(--red);font-weight:600;">✗ ดึงข้อมูลไม่ได้</div>
+      <div style="color:var(--text3);font-size:11px;margin-top:6px;line-height:1.8;">
+        ตรวจสอบ:<br>
+        • Share Sheet เป็น "Anyone with the link" หรือยัง?<br>
+        • ชื่อ Sheet Tab ถูกต้อง (case-sensitive)?<br>
+        • URL ถูกต้อง?
+      </div>`;
+    result.style.display='block';
+    if(hint)hint.textContent='✗ ดึงข้อมูลไม่ได้ — ดูรายละเอียดด้านล่าง';
+  }
 }
 
 async function syncFromSheets(){
@@ -2796,485 +3429,4 @@ function initCryptoDonut(){
   const coins=cryptoPositions.map(c=>{const mkt=c.liveKey&&livePrices[c.liveKey]?livePrices[c.liveKey].last:c.marketPrice;return{sym:c.sym,value:mkt*c.units,color:c.color};});
   const sorted=[...coins].sort((a,b)=>b.value-a.value);
   const tot=coins.reduce((s,c)=>s+c.value,0)||1;
-  cryptoDonut=new Chart(ctx,{type:'doughnut',data:{labels:sorted.map(c=>c.sym),datasets:[{data:sorted.map(c=>c.value),backgroundColor:sorted.map(c=>c.color+'cc'),borderColor:sorted.map(c=>c.color),borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmtN(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]/tot>=0.05,color:'#fff',font:{size:11,weight:'700'},textShadowColor:'rgba(0,0,0,.4)',textShadowBlur:4,formatter:(val,ctx)=>{const p=(val/tot*100).toFixed(1);const l=ctx.chart.data.labels[ctx.dataIndex];return l+'\n'+p+'%';},textAlign:'center',anchor:'center',align:'center'}}},plugins:[ChartDataLabels]});
-  const t=total();const cv=coins.reduce((s,c)=>s+c.value,0);
-  const el=document.getElementById('cryptoAmt');if(el)el.textContent=fmtN(cv);
-  const wt=document.getElementById('cryptoWt');if(wt)wt.textContent=pct(cv,t);
-  const totEl=document.getElementById('cryptoDonutTotal');if(totEl)totEl.textContent=fmtN(cv);
-  // Legend — same style as Sector Allocation
-  const legEl=document.getElementById('cryptoDonutLegend');
-  if(legEl)legEl.innerHTML=sorted.map(x=>{
-    const pp=(x.value/tot*100).toFixed(1);
-    return`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);">
-      <div style="width:10px;height:10px;border-radius:3px;background:${x.color};flex-shrink:0;"></div>
-      <span style="font-size:12px;color:var(--text2);flex:1;">${x.sym}</span>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-size:12px;font-weight:700;color:var(--text);">${fmtN(x.value)}</div>
-        <div style="font-size:10px;color:var(--text3);">${pp}%</div>
-      </div>
-    </div>`;
-  }).join('');
-  initCryptoPnlBar(coins);
-}
-
-function initCryptoPnlBar(coins){
-  const ctx=document.getElementById('cryptoPnlBar');if(!ctx)return;
-  if(cryptoPnlBar){cryptoPnlBar.destroy();cryptoPnlBar=null;}
-  const data=cryptoPositions.filter(c=>c.sym!=='THB'&&c.avgPrice>0).map(c=>{
-    const mkt=c.liveKey&&livePrices[c.liveKey]?livePrices[c.liveKey].last:c.marketPrice;
-    const pnl=Math.round((mkt-c.avgPrice)*c.units);
-    return{label:c.sym,pnl,color:pnl>=0?'rgba(16,185,129,.75)':'rgba(239,68,68,.75)',border:pnl>=0?'#10b981':'#ef4444'};
-  }).sort((a,b)=>b.pnl-a.pnl);
-  cryptoPnlBar=new Chart(ctx,{type:'bar',data:{labels:data.map(d=>d.label),datasets:[{data:data.map(d=>d.pnl),backgroundColor:data.map(d=>d.color),borderColor:data.map(d=>d.border),borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:32,bottom:4}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ฿'+Math.round(c.raw).toLocaleString()}},datalabels:{anchor:ctx=>ctx.dataset.data[ctx.dataIndex]>=0?'end':'start',align:ctx=>ctx.dataset.data[ctx.dataIndex]>=0?'end':'start',offset:4,color:ctx=>ctx.dataset.data[ctx.dataIndex]>=0?'#10b981':'#ef4444',font:{size:11,weight:'700'},formatter:v=>'฿'+(v>=0?'+':'')+Math.round(v).toLocaleString()}},scales:{x:{grid:{display:false},ticks:{color:'#7c8fa8',font:{size:11,weight:'600'}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7c8fa8',font:{size:10},callback:v=>'฿'+(v>=0?'':'-')+Math.abs(Math.round(v/1000))+'K'},beginAtZero:false}}},plugins:[ChartDataLabels]});
-}
-
-function initPvdDonut(){
-  const ctx=document.getElementById('pvdDonut');if(!ctx)return;
-  if(pvdDonut){pvdDonut.destroy();pvdDonut=null;}
-  const v=assets[2].value;
-  pvdDonut=new Chart(ctx,{type:'doughnut',data:{labels:['Equity','Fixed Income','Money Market'],datasets:[{data:[Math.round(v*.5),Math.round(v*.4),Math.round(v*.1)],backgroundColor:['#10b981bb','#3b82f6bb','#f59e0bbb'],borderColor:['#10b981','#3b82f6','#f59e0b'],borderWidth:1.5,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtN(c.raw)}}}}});
-  const pvdEl=document.getElementById('pvdAmt');if(pvdEl)pvdEl.textContent=fmtN(v);
-  const pvdWt=document.getElementById('pvdWt');if(pvdWt)pvdWt.textContent=pct(v,total());
-  const pvdAmtD=document.getElementById('pvdAmtD');if(pvdAmtD)pvdAmtD.textContent=fmtN(v);
-}
-
-function initPvdLine(){
-  const ctx=document.getElementById('pvdLine');if(!ctx)return;
-  if(pvdLine){pvdLine.destroy();pvdLine=null;}
-  const v=assets[2].value;const labels=[];const data=[];const now2=new Date();
-  for(let i=11;i>=0;i--){const d=new Date(now2);d.setMonth(d.getMonth()-i);labels.push(d.toLocaleDateString('en-US',{month:'short'}));data.push(Math.round(v*(0.8+(0.2*(11-i)/11))));}
-  data[data.length-1]=Math.round(v);
-  pvdLine=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,fill:true,tension:.4,backgroundColor:'rgba(63,168,128,.12)',borderColor:'#3fa880',borderWidth:2,pointRadius:0,pointHoverRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtN(c.raw)}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'K'}}}}});
-}
-
-function initInsBar(){
-  const ctx=document.getElementById('insBar');if(!ctx)return;
-  if(insBarChart){insBarChart.destroy();insBarChart=null;}
-  insBarChart=new Chart(ctx,{type:'bar',data:{labels:insurance.map(p=>p.name),datasets:[{label:'Sum Assured',data:insurance.map(p=>p.sumAssured),backgroundColor:'rgba(139,110,212,.4)',borderColor:'#8b6ed4',borderWidth:1.5,borderRadius:4},{label:'Cash Value',data:insurance.map(p=>p.surrenderValue),backgroundColor:'rgba(63,168,128,.4)',borderColor:'#3fa880',borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7c8fa8',font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmtN(c.raw)}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},maxRotation:30}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'K'}}}}});
-}
-
-function _vaCalcTarget(){
-  const VA_BASE=232000;
-  const picker=document.getElementById('vaMonthPicker');
-  const now=new Date();
-  if(picker&&!picker.value)picker.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const selDate=picker&&picker.value?new Date(picker.value+'-01'):now;
-  let target=VA_BASE;
-  let d=new Date(2026,0,1);
-  const end=new Date(selDate.getFullYear(),selDate.getMonth(),1);
-  while(d<=end){target+=6500+(d.getFullYear()-2026)*500;d.setMonth(d.getMonth()+1);}
-  return target;
-}
-
-function updateVACalc(){
-  // save alloc from inputs
-  const tickers=['ADVANC','AOT','AP','BDMS','CPALL','KBANK'];
-  tickers.forEach(t=>{const inp=document.getElementById('va-alloc-'+t);if(inp)VA_ALLOC_CONFIG[t]=parseFloat(inp.value)||0;});
-  localStorage.setItem('va_alloc',JSON.stringify(VA_ALLOC_CONFIG));
-  const target=_vaCalcTarget();
-  let totalTarget=0,totalCurrent=0;
-  let totalTxn=0;
-  tickers.forEach(ticker=>{
-    const alloc=(VA_ALLOC_CONFIG[ticker]||0)/100;
-    const s=stocks.find(k=>k.ticker===ticker);
-    const stockTarget=Math.round(target*alloc);
-    const currentVal=s?Math.round((s.currentPrice||s.avgCost)*s.shares):0;
-    const diff=stockTarget-currentVal;
-    const currentPrice=s?(s.currentPrice||s.avgCost):0;
-    const currentShares2=s?s.shares:0;
-    const sharesNeeded=currentPrice>0?Math.ceil(stockTarget/currentPrice)-currentShares2:0;
-    totalTxn+=sharesNeeded*currentPrice;
-    totalTarget+=stockTarget;totalCurrent+=currentVal;
-    const tEl=document.getElementById('va-target-'+ticker);
-    const aEl=document.getElementById('va-action-'+ticker);
-    const sEl=document.getElementById('va-shares-'+ticker);
-    if(tEl)tEl.textContent=fmtN(stockTarget);
-    if(aEl){
-      const txnAmt=Math.round(Math.abs(sharesNeeded)*currentPrice);
-      aEl.textContent=sharesNeeded===0?'✓ On Track':sharesNeeded>0?'Buy +'+fmtN(txnAmt):'Sell '+fmtN(txnAmt);
-      aEl.style.background=sharesNeeded===0?'rgba(100,116,139,.1)':sharesNeeded>0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)';
-      aEl.style.color=sharesNeeded===0?'var(--text3)':sharesNeeded>0?'var(--em2)':'var(--red)';
-    }
-    if(sEl){
-      sEl.textContent=sharesNeeded===0?'—':(sharesNeeded>0?'+':'')+sharesNeeded.toLocaleString()+' shares';
-      sEl.style.color=sharesNeeded===0?'var(--text3)':sharesNeeded>0?'var(--em2)':'var(--red)';
-    }
-  });
-  const totalDiff=totalTarget-totalCurrent;
-  const netTxn=Math.round(totalTxn);
-  const stEl=document.getElementById('va-sum-target');const scEl=document.getElementById('va-sum-current');
-  const sdEl=document.getElementById('va-sum-diff');const sdLEl=document.getElementById('va-sum-diff-label');
-  if(stEl)stEl.textContent=fmtN(totalTarget);
-  if(scEl)scEl.textContent=fmtN(totalCurrent);
-  if(sdEl){sdEl.textContent=(netTxn>=0?'+':'')+fmtN(netTxn);sdEl.style.color=netTxn>=0?'var(--em2)':'var(--red)';}
-  if(sdLEl)sdLEl.textContent=netTxn>=0?'TO BUY':'TO SELL';
-  const ttEl=document.getElementById('va-total-target');const tcEl=document.getElementById('va-total-current');const taEl=document.getElementById('va-total-action');
-  if(ttEl)ttEl.textContent=fmtN(totalTarget);
-  if(tcEl)tcEl.textContent=fmtN(totalCurrent);
-  if(taEl){taEl.textContent=(netTxn>=0?'Net Buy +':'Net Sell ')+fmtN(Math.abs(netTxn));taEl.style.color=netTxn>=0?'var(--em2)':'var(--red)';taEl.style.background=netTxn>=0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)';}
-}
-
-function renderVACalc(){
-  const card=document.getElementById('vaCalcCard');if(!card)return;
-  const target=_vaCalcTarget();
-  const tickers=['ADVANC','AOT','AP','BDMS','CPALL','KBANK'];
-  const rows=tickers.map((ticker,i)=>{
-    const alloc=(VA_ALLOC_CONFIG[ticker]||0)/100;
-    const s=stocks.find(k=>k.ticker===ticker);
-    const currentPrice=s?(s.currentPrice||s.avgCost):0;
-    const currentShares=s?s.shares:0;
-    const stockTarget=Math.round(target*alloc);
-    const currentVal=s?Math.round(currentPrice*currentShares):0;
-    const diff=stockTarget-currentVal;
-    const sharesNeeded=currentPrice>0?Math.ceil(stockTarget/currentPrice)-currentShares:0;
-    return{ticker,alloc,currentPrice,currentShares,stockTarget,currentVal,diff,sharesNeeded};
-  });
-  const totalTarget=rows.reduce((s,r)=>s+r.stockTarget,0);
-  const totalCurrent=rows.reduce((s,r)=>s+r.currentVal,0);
-  const totalDiff=totalTarget-totalCurrent;
-  const netTxn=Math.round(rows.reduce((s,r)=>s+r.sharesNeeded*r.currentPrice,0));
-  const inputStyle=`width:52px;text-align:center;padding:3px 6px;font-size:13px;font-weight:700;color:var(--blue2);background:rgba(91,150,212,.1);border:1px solid rgba(91,150,212,.25);border-radius:8px;outline:none;font-family:'Inter',sans-serif;`;
-  // ── Summary pills ──
-  document.getElementById('vaSummary').innerHTML=`
-    <div style="flex:1;background:rgba(91,150,212,.08);border:1px solid rgba(91,150,212,.2);border-radius:12px;padding:12px 16px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:6px;">VA TARGET</div>
-      <div id="va-sum-target" style="font-size:22px;font-weight:800;color:var(--blue2);letter-spacing:-1px;">${fmtN(totalTarget)}</div>
-    </div>
-    <div style="flex:1;background:rgba(63,168,128,.08);border:1px solid rgba(63,168,128,.2);border-radius:12px;padding:12px 16px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:6px;">CURRENT VALUE</div>
-      <div id="va-sum-current" style="font-size:22px;font-weight:800;color:var(--em2);letter-spacing:-1px;">${fmtN(totalCurrent)}</div>
-    </div>
-    <div style="flex:1;background:${netTxn>=0?'rgba(63,168,128,.08)':'rgba(217,80,80,.08)'};border:1px solid ${netTxn>=0?'rgba(63,168,128,.2)':'rgba(217,80,80,.2)'};border-radius:12px;padding:12px 16px;">
-      <div id="va-sum-diff-label" style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:6px;">${netTxn>=0?'TO BUY':'TO SELL'}</div>
-      <div id="va-sum-diff" style="font-size:22px;font-weight:800;letter-spacing:-1px;color:${netTxn>=0?'var(--em2)':'var(--red)'};">${netTxn>=0?'+':''}${fmtN(netTxn)}</div>
-    </div>`;
-  // ── Table ──
-  document.getElementById('vaTable').innerHTML=`
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr style="font-size:11px;color:var(--text3);border-bottom:2px solid var(--border);">
-        <th style="text-align:left;padding:8px 12px;font-weight:600;">Stock</th>
-        <th style="text-align:center;padding:8px 12px;font-weight:600;">Alloc %</th>
-        <th style="text-align:right;padding:8px 12px;font-weight:600;">Current Price (฿)</th>
-        <th style="text-align:right;padding:8px 12px;font-weight:600;">Current Shares</th>
-        <th style="text-align:right;padding:8px 12px;font-weight:600;">VA Target (฿)</th>
-        <th style="text-align:right;padding:8px 12px;font-weight:600;">Current Value (฿)</th>
-        <th style="text-align:right;padding:8px 12px;font-weight:600;">Shares to Buy/Sell</th>
-        <th style="text-align:right;padding:8px 12px;font-weight:600;">Action</th>
-      </tr></thead>
-      <tbody>${rows.map((r,i)=>{
-        const abs=Math.abs(r.diff);
-        const actBg=r.sharesNeeded===0?'rgba(100,116,139,.1)':r.diff>0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)';
-        const actCol=r.sharesNeeded===0?'var(--text3)':r.diff>0?'var(--em2)':'var(--red)';
-        const txnAmt=Math.round(Math.abs(r.sharesNeeded)*r.currentPrice);
-        const actTxt=r.sharesNeeded===0?'✓ On Track':r.sharesNeeded>0?'Buy +'+fmtN(txnAmt):'Sell '+fmtN(txnAmt);
-        const shareCol=r.sharesNeeded===0?'var(--text3)':r.sharesNeeded>0?'var(--em2)':'var(--red)';
-        const shareTxt=r.sharesNeeded===0?'—':(r.sharesNeeded>0?'+':'')+r.sharesNeeded.toLocaleString()+' shares';
-        return`<tr style="border-bottom:1px solid rgba(0,0,0,.05);background:${i%2?'rgba(0,0,0,.02)':'transparent'};">
-          <td style="padding:10px 12px;"><span style="font-size:14px;font-weight:800;color:var(--blue2);">${r.ticker}</span></td>
-          <td style="padding:10px 12px;text-align:center;">
-            <input id="va-alloc-${r.ticker}" type="number" min="0" max="100" step="1" value="${Math.round(r.alloc*100)}"
-              style="${inputStyle}" onchange="updateVACalc()" oninput="updateVACalc()">
-          </td>
-          <td style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:600;color:var(--text2);">฿${r.currentPrice.toFixed(2)}</td>
-          <td style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:700;color:var(--text);">${r.currentShares.toLocaleString()}</td>
-          <td style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:700;color:var(--text);" id="va-target-${r.ticker}">${fmtN(r.stockTarget)}</td>
-          <td style="padding:10px 12px;text-align:right;font-size:13.5px;color:var(--text2);">${fmtN(r.currentVal)}</td>
-          <td id="va-shares-${r.ticker}" style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:700;color:${shareCol};">${shareTxt}</td>
-          <td style="padding:10px 12px;text-align:right;">
-            <span id="va-action-${r.ticker}" style="font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:8px;background:${actBg};color:${actCol};">${actTxt}</span>
-          </td>
-        </tr>`;}).join('')}
-        <tr style="border-top:2px solid var(--border);background:rgba(0,0,0,.02);">
-          <td style="padding:10px 12px;font-size:13px;font-weight:700;color:var(--text);" colspan="4">Total</td>
-          <td style="padding:10px 12px;text-align:right;font-size:14px;font-weight:800;color:var(--blue2);" id="va-total-target">${fmtN(totalTarget)}</td>
-          <td style="padding:10px 12px;text-align:right;font-size:14px;font-weight:800;color:var(--em2);" id="va-total-current">${fmtN(totalCurrent)}</td>
-          <td colspan="2" style="padding:10px 12px;text-align:right;">
-            <span id="va-total-action" style="font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:8px;background:${netTxn>=0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)'};color:${netTxn>=0?'var(--em2)':'var(--red)'};">
-              ${netTxn>=0?'Net Buy +':'Net Sell '}${fmtN(Math.abs(netTxn))}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>`;
-}
-
-function initSectorDonut(){
-  const ctx=document.getElementById('sectorDonut');if(!ctx)return;
-  if(sectorChart){sectorChart.destroy();sectorChart=null;}
-  const sectors={};stocks.forEach(s=>{const v=(s.currentPrice||s.avgCost)*s.shares;sectors[s.sector]=(sectors[s.sector]||0)+v;});
-  const labels=Object.keys(sectors);const data=Object.values(sectors);const colors=labels.map(l=>SECTOR_COLORS[l]||'#94a3b8');
-  const tot=data.reduce((s,v)=>s+v,0);
-  // Sort by value descending
-  const sorted=[...labels.map((l,i)=>({l,v:data[i],c:colors[i]}))].sort((a,b)=>b.v-a.v);
-  const sLabels=sorted.map(x=>x.l),sData=sorted.map(x=>x.v),sColors=sorted.map(x=>x.c);
-  sectorChart=new Chart(ctx,{type:'doughnut',data:{labels:sLabels,datasets:[{data:sData,backgroundColor:sColors.map(c=>c+'cc'),borderColor:sColors,borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmtN(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]/tot>=0.05,color:'#fff',font:{size:11,weight:'700'},textShadowColor:'rgba(0,0,0,.4)',textShadowBlur:4,formatter:(val,ctx)=>{const pct=(val/tot*100).toFixed(1);const lbl=ctx.chart.data.labels[ctx.dataIndex];return lbl+'\n'+pct+'%';},textAlign:'center',anchor:'center',align:'center'}}},plugins:[ChartDataLabels]});
-  const totEl=document.getElementById('sectorTotal');
-  if(totEl)totEl.textContent=fmtN(tot);
-  const legEl=document.getElementById('sectorLegend');
-  if(legEl)legEl.innerHTML=sorted.map(x=>{
-    const pp=(x.v/tot*100).toFixed(1);
-    return`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.05);">
-      <div style="width:10px;height:10px;border-radius:3px;background:${x.c};flex-shrink:0;"></div>
-      <span style="font-size:12px;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${x.l}</span>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-size:12px;font-weight:700;color:var(--text);">${fmtN(x.v)}</div>
-        <div style="font-size:10px;color:var(--text3);">${pp}%</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function initReturnBar(){
-  const ctx=document.getElementById('stockReturnBar');if(!ctx)return;
-  if(returnBarChart){returnBarChart.destroy();returnBarChart=null;}
-  const s=stockSummary();
-  const barColors=['#5b96d4','#3fa880','#e07830','#c98f08','#d95050'];
-  returnBarChart=new Chart(ctx,{type:'bar',data:{labels:['Invested','Mkt Value','Sell','Dividends','Tax'],datasets:[{data:[s.invested,s.current,s.sell,s.div,s.tax],backgroundColor:barColors.map(c=>c+'70'),borderColor:barColors,borderWidth:1.5,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ฿'+Math.round(c.raw).toLocaleString()}},datalabels:{anchor:'end',align:'end',offset:2,color:ctx=>barColors[ctx.dataIndex],font:{size:12,weight:'700'},formatter:v=>'฿'+Math.round(v).toLocaleString()}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:11,weight:'600'}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'K'}}}},plugins:[ChartDataLabels]});
-}
-
-// ══════════════ LIVE PRICES ══════════════
-function updateLivePriceRows(){
-  const rowsEl=document.getElementById('livePriceRows');if(!rowsEl)return;
-  rowsEl.innerHTML=COINS.map(c=>{
-    const lp=livePrices[c.sym];
-    if(!lp)return`<div class="price-row shimmer" style="height:64px;"></div>`;
-    const chg=lp.percentChange;const up=chg>=0;
-    return`<div class="price-row"><div style="display:flex;align-items:center;gap:10px;"><div style="width:36px;height:36px;border-radius:10px;background:${c.bg};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:${c.color};">${c.icon}</div><div><div style="font-size:13px;font-weight:700;">${c.name}</div><div style="font-size:11px;color:var(--text3);">${c.abbr}/THB · CoinGecko</div></div></div><div style="margin-left:auto;text-align:right;"><div style="font-size:14px;font-weight:700;color:var(--text1);">฿${Math.round(lp.last).toLocaleString('en-US')}</div><div style="font-size:11px;font-weight:600;color:${up?'#10b981':'#ef4444'};">${up?'+':''}${chg.toFixed(2)}% 24h</div></div></div>`;
-  }).join('');
-}
-
-async function fetchPrices(){
-  const badge=document.getElementById('liveBadge');
-  if(badge)badge.className='live-badge loading';
-  const allIds=[...new Set([
-    ...COINS.map(c=>c.sym),
-    ...cryptoPositions.filter(c=>c.liveKey).map(c=>c.liveKey)
-  ])].join(',');
-  const url=`https://api.coingecko.com/api/v3/simple/price?ids=${allIds}&vs_currencies=thb&include_24hr_change=true`;
-  try{
-    const r=await fetch(url,{cache:'no-store'});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    Object.entries(data).forEach(([id,v])=>{
-      livePrices[id]={last:v.thb||0,percentChange:v.thb_24h_change||0};
-    });
-    // Update crypto asset total value
-    const cryptoAsset=assets.find(a=>a.name==='Bitkub Crypto');
-    if(cryptoAsset){
-      const totalVal=cryptoPositions.reduce((s,c)=>{
-        const lk=c.liveKey&&livePrices[c.liveKey];
-        return s+(lk?lk.last*c.units:c.marketPrice*c.units);
-      },0);
-      if(totalVal>0){cryptoAsset.value=Math.round(totalVal);saveAll();}
-    }
-    updateLivePriceRows();
-    if(badge)badge.className='live-badge';
-    const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-    const fetchEl=document.getElementById('lastFetch');if(fetchEl)fetchEl.textContent=now;
-    const liveText=document.getElementById('liveText');if(liveText)liveText.textContent=`⚡ Live · ${now}`;
-    renderDashboard();
-    if(document.getElementById('page-crypto')&&!document.getElementById('page-crypto').classList.contains('hidden')){
-      initCryptoDonut();initCryptoPnlBar();renderCryptoTable();renderCryptoHeatmap();
-    }
-  }catch(e){
-    console.warn('CoinGecko fetch failed:',e.message);
-    if(badge)badge.className='live-badge error';
-    const liveText=document.getElementById('liveText');if(liveText)liveText.textContent='❌ ไม่ได้เชื่อมต่อ';
-  }
-}
-
-function openModal(idx){
-  const a=assets[idx];
-  document.getElementById('editIdx').value=idx;
-  document.getElementById('editName').value=a.name;
-  document.getElementById('editVal').value=a.value||0;
-  document.getElementById('editNote').value='';
-  document.getElementById('editModal').classList.add('open');
-}
-function closeModal(id){
-  const m=document.getElementById(id||'editModal');
-  if(m)m.classList.remove('open');
-}
-function saveEdit(){
-  const idx=parseInt(document.getElementById('editIdx').value);
-  const newVal=parseFloat(document.getElementById('editVal').value)||0;
-  if(newVal>0){assets[idx].value=newVal;saveAll();renderDashboard();setTimeout(initDonut,120);}
-  closeModal('editModal');
-}
-function showToast(msg,dur){
-  const t=document.getElementById('toast');const m=document.getElementById('toastMsg');
-  if(!t||!m)return;m.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),dur||3000);
-}
-
-// ══════════════ PIN SECURITY ══════════════
-const PIN_KEY='inv_pin_hash';
-const PIN_SALT='inv_pin_salt';
-const PIN_FAIL='inv_pin_fails';
-const PIN_LOCK='inv_pin_lockuntil';
-const AUTO_LOCK_MS=15*60*1000;
-let _pinBuffer='';
-let _pinMode='unlock';
-let _pinSetupFirst='';
-let _autoLockTimer=null;
-let _pinEnabled=true;
-
-async function _sha256(str){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-function _getSalt(){
-  let s=localStorage.getItem(PIN_SALT);
-  if(!s){s=crypto.getRandomValues(new Uint8Array(16)).join('-');localStorage.setItem(PIN_SALT,s);}
-  return s;
-}
-function pinKey(d){
-  if(_pinBuffer.length>=4)return;
-  _pinBuffer+=d;_updateDots();
-  if(_pinBuffer.length===4)setTimeout(_pinSubmit,120);
-}
-function pinDel(){if(_pinBuffer.length>0){_pinBuffer=_pinBuffer.slice(0,-1);_updateDots();}}
-function pinClear(){_pinBuffer='';_updateDots();document.getElementById('pinMsg').textContent='';}
-function _updateDots(){
-  for(let i=0;i<4;i++){
-    const d=document.getElementById('pd'+i);
-    d.classList.toggle('filled',i<_pinBuffer.length);d.classList.remove('error');
-  }
-}
-function _setMsg(msg,color='#ef4444'){const el=document.getElementById('pinMsg');el.textContent=msg;el.style.color=color;}
-function _setPadDisabled(dis){document.querySelectorAll('.pin-btn').forEach(b=>b.disabled=dis);}
-function _pinError(msg){
-  _setMsg(msg);
-  for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');
-  setTimeout(()=>{_pinBuffer='';_updateDots();},400);
-}
-async function _pinSubmit(){
-  const now=Date.now();
-  const lockUntil=parseInt(localStorage.getItem(PIN_LOCK)||'0');
-  if(now<lockUntil){_pinError('ถูกล็อค รอ...');_pinBuffer='';return;}
-  if(_pinMode==='setup1'){
-    _pinSetupFirst=_pinBuffer;_pinBuffer='';
-    document.getElementById('pinTitle').textContent='ยืนยัน PIN';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN อีกครั้งเพื่อยืนยัน';
-    document.getElementById('pinClearBtn').style.display='';
-    _updateDots();_setMsg('');_pinMode='setup2';return;
-  }
-  if(_pinMode==='setup2'){
-    if(_pinBuffer!==_pinSetupFirst){
-      _pinError('PIN ไม่ตรงกัน ลองใหม่');
-      setTimeout(()=>{
-        _pinMode='setup1';_pinSetupFirst='';
-        document.getElementById('pinTitle').textContent='ตั้ง PIN ใหม่';
-        document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลัก';
-        document.getElementById('pinClearBtn').style.display='none';
-        _setMsg('');
-      },800);return;
-    }
-    const hash=await _sha256(_pinBuffer+_getSalt());
-    localStorage.setItem(PIN_KEY,hash);localStorage.removeItem(PIN_FAIL);
-    _pinUnlockApp();return;
-  }
-  const stored=localStorage.getItem(PIN_KEY);
-  const hash=await _sha256(_pinBuffer+_getSalt());
-  if(hash===stored){
-    localStorage.removeItem(PIN_FAIL);_pinUnlockApp();
-  }else{
-    let fails=(parseInt(localStorage.getItem(PIN_FAIL)||'0'))+1;
-    localStorage.setItem(PIN_FAIL,fails);
-    if(fails>=3){
-      const until=Date.now()+30000;
-      localStorage.setItem(PIN_LOCK,until);localStorage.setItem(PIN_FAIL,'0');
-      _setPadDisabled(true);_pinError('กรอกผิด 3 ครั้ง ล็อค 30 วินาที');
-      let rem=30;
-      const iv=setInterval(()=>{
-        rem--;document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
-        if(rem<=0){clearInterval(iv);_setPadDisabled(false);document.getElementById('pinLockMsg').textContent='';_setMsg('');}
-      },1000);
-    }else{
-      _pinError(`PIN ไม่ถูกต้อง (เหลือ ${3-fails} ครั้ง)`);
-    }
-    _pinBuffer='';
-  }
-}
-function _pinUnlockApp(){
-  document.getElementById('pinOverlay').style.display='none';
-  document.getElementById('pinChangeLink').style.display='';
-  _resetAutoLock();
-}
-function pinLockApp(){
-  _pinBuffer='';_updateDots();
-  document.getElementById('pinOverlay').style.display='flex';
-  document.getElementById('pinTitle').textContent='Enter PIN';
-  document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
-  document.getElementById('pinMsg').textContent='';
-  document.getElementById('pinLockMsg').textContent='';
-  _pinMode='unlock';
-  if(_autoLockTimer)clearTimeout(_autoLockTimer);
-}
-function pinStartChange(){
-  _pinBuffer='';_updateDots();_pinSetupFirst='';
-  document.getElementById('pinTitle').textContent='ตั้ง PIN ใหม่';
-  document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักใหม่';
-  document.getElementById('pinClearBtn').style.display='none';
-  document.getElementById('pinMsg').textContent='';
-  document.getElementById('pinChangeLink').style.display='none';
-  document.getElementById('pinOverlay').style.display='flex';
-  _pinMode='setup1';
-}
-function _resetAutoLock(){
-  if(!_pinEnabled)return;
-  if(_autoLockTimer)clearTimeout(_autoLockTimer);
-  _autoLockTimer=setTimeout(pinLockApp,AUTO_LOCK_MS);
-}
-['click','keydown','mousemove','touchstart'].forEach(ev=>{
-  document.addEventListener(ev,()=>{
-    if(_pinEnabled&&document.getElementById('pinOverlay').style.display==='none')_resetAutoLock();
-  },{passive:true});
-});
-document.addEventListener('keydown',e=>{
-  if(document.getElementById('pinOverlay').style.display==='none')return;
-  if(e.key>='0'&&e.key<='9')pinKey(e.key);
-  else if(e.key==='Backspace')pinDel();
-  else if(e.key==='Escape'){_pinBuffer='';_updateDots();}
-});
-function _pinInit(){
-  // PIN disabled — skip directly to app
-  _pinEnabled=false;
-  document.getElementById('pinOverlay').style.display='none';
-  document.getElementById('pinChangeLink').style.display='';
-  return;
-  const overlay=document.getElementById('pinOverlay');
-  overlay.style.display='flex';
-  const hasPin=!!localStorage.getItem(PIN_KEY);
-  if(!hasPin){
-    _pinMode='setup1';
-    document.getElementById('pinTitle').textContent='ตั้ง PIN ครั้งแรก';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักเพื่อปกป้อง app';
-  }else{
-    _pinMode='unlock';
-    document.getElementById('pinTitle').textContent='Enter PIN';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
-    const lockUntil=parseInt(localStorage.getItem(PIN_LOCK)||'0');
-    if(Date.now()<lockUntil){
-      _setPadDisabled(true);
-      let rem=Math.ceil((lockUntil-Date.now())/1000);
-      document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
-      const iv=setInterval(()=>{
-        rem--;document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
-        if(rem<=0){clearInterval(iv);_setPadDisabled(false);document.getElementById('pinLockMsg').textContent='';}
-      },1000);
-    }
-  }
-}
-
-// ══════════════ STARTUP ══════════════
-(function(){
-  renderDashboard();
-  setTimeout(()=>{initDonut();initLine(12);initAssetLine(12);},300);
-  fetchPrices();
-  startLivePriceAutoUpdate();
-  _pinInit();
-})();
-</script>
-</body>
-</html>
+  cryptoDonut=new Chart(ctx,{type:'doughnut',data:{labels:sorted.map(c=>c.sym),datasets:[{data:sorted.map(c=>c.value),backgroundColor:sorted.map(c=>c.color+'cc'),borderColor:sorted.map(c=>c.color),borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmtN(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]/tot>=0.05,color:'#fff',font:{size:11,weight:'700'},textShadowColor:'rgba(0,
