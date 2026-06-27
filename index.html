@@ -3429,4 +3429,485 @@ function initCryptoDonut(){
   const coins=cryptoPositions.map(c=>{const mkt=c.liveKey&&livePrices[c.liveKey]?livePrices[c.liveKey].last:c.marketPrice;return{sym:c.sym,value:mkt*c.units,color:c.color};});
   const sorted=[...coins].sort((a,b)=>b.value-a.value);
   const tot=coins.reduce((s,c)=>s+c.value,0)||1;
-  cryptoDonut=new Chart(ctx,{type:'doughnut',data:{labels:sorted.map(c=>c.sym),datasets:[{data:sorted.map(c=>c.value),backgroundColor:sorted.map(c=>c.color+'cc'),borderColor:sorted.map(c=>c.color),borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmtN(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]/tot>=0.05,color:'#fff',font:{size:11,weight:'700'},textShadowColor:'rgba(0,
+  cryptoDonut=new Chart(ctx,{type:'doughnut',data:{labels:sorted.map(c=>c.sym),datasets:[{data:sorted.map(c=>c.value),backgroundColor:sorted.map(c=>c.color+'cc'),borderColor:sorted.map(c=>c.color),borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmtN(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]/tot>=0.05,color:'#fff',font:{size:11,weight:'700'},textShadowColor:'rgba(0,0,0,.4)',textShadowBlur:4,formatter:(val,ctx)=>{const p=(val/tot*100).toFixed(1);const l=ctx.chart.data.labels[ctx.dataIndex];return l+'\n'+p+'%';},textAlign:'center',anchor:'center',align:'center'}}},plugins:[ChartDataLabels]});
+  const t=total();const cv=coins.reduce((s,c)=>s+c.value,0);
+  const el=document.getElementById('cryptoAmt');if(el)el.textContent=fmtN(cv);
+  const wt=document.getElementById('cryptoWt');if(wt)wt.textContent=pct(cv,t);
+  const totEl=document.getElementById('cryptoDonutTotal');if(totEl)totEl.textContent=fmtN(cv);
+  // Legend — same style as Sector Allocation
+  const legEl=document.getElementById('cryptoDonutLegend');
+  if(legEl)legEl.innerHTML=sorted.map(x=>{
+    const pp=(x.value/tot*100).toFixed(1);
+    return`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+      <div style="width:10px;height:10px;border-radius:3px;background:${x.color};flex-shrink:0;"></div>
+      <span style="font-size:12px;color:var(--text2);flex:1;">${x.sym}</span>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">${fmtN(x.value)}</div>
+        <div style="font-size:10px;color:var(--text3);">${pp}%</div>
+      </div>
+    </div>`;
+  }).join('');
+  initCryptoPnlBar(coins);
+}
+
+function initCryptoPnlBar(coins){
+  const ctx=document.getElementById('cryptoPnlBar');if(!ctx)return;
+  if(cryptoPnlBar){cryptoPnlBar.destroy();cryptoPnlBar=null;}
+  const data=cryptoPositions.filter(c=>c.sym!=='THB'&&c.avgPrice>0).map(c=>{
+    const mkt=c.liveKey&&livePrices[c.liveKey]?livePrices[c.liveKey].last:c.marketPrice;
+    const pnl=Math.round((mkt-c.avgPrice)*c.units);
+    return{label:c.sym,pnl,color:pnl>=0?'rgba(16,185,129,.75)':'rgba(239,68,68,.75)',border:pnl>=0?'#10b981':'#ef4444'};
+  }).sort((a,b)=>b.pnl-a.pnl);
+  cryptoPnlBar=new Chart(ctx,{type:'bar',data:{labels:data.map(d=>d.label),datasets:[{data:data.map(d=>d.pnl),backgroundColor:data.map(d=>d.color),borderColor:data.map(d=>d.border),borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:32,bottom:4}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ฿'+Math.round(c.raw).toLocaleString()}},datalabels:{anchor:ctx=>ctx.dataset.data[ctx.dataIndex]>=0?'end':'start',align:ctx=>ctx.dataset.data[ctx.dataIndex]>=0?'end':'start',offset:4,color:ctx=>ctx.dataset.data[ctx.dataIndex]>=0?'#10b981':'#ef4444',font:{size:11,weight:'700'},formatter:v=>'฿'+(v>=0?'+':'')+Math.round(v).toLocaleString()}},scales:{x:{grid:{display:false},ticks:{color:'#7c8fa8',font:{size:11,weight:'600'}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7c8fa8',font:{size:10},callback:v=>'฿'+(v>=0?'':'-')+Math.abs(Math.round(v/1000))+'K'},beginAtZero:false}}},plugins:[ChartDataLabels]});
+}
+
+function initPvdDonut(){
+  const ctx=document.getElementById('pvdDonut');if(!ctx)return;
+  if(pvdDonut){pvdDonut.destroy();pvdDonut=null;}
+  const v=assets[2].value;
+  pvdDonut=new Chart(ctx,{type:'doughnut',data:{labels:['Equity','Fixed Income','Money Market'],datasets:[{data:[Math.round(v*.5),Math.round(v*.4),Math.round(v*.1)],backgroundColor:['#10b981bb','#3b82f6bb','#f59e0bbb'],borderColor:['#10b981','#3b82f6','#f59e0b'],borderWidth:1.5,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtN(c.raw)}}}}});
+  const pvdEl=document.getElementById('pvdAmt');if(pvdEl)pvdEl.textContent=fmtN(v);
+  const pvdWt=document.getElementById('pvdWt');if(pvdWt)pvdWt.textContent=pct(v,total());
+  const pvdAmtD=document.getElementById('pvdAmtD');if(pvdAmtD)pvdAmtD.textContent=fmtN(v);
+}
+
+function initPvdLine(){
+  const ctx=document.getElementById('pvdLine');if(!ctx)return;
+  if(pvdLine){pvdLine.destroy();pvdLine=null;}
+  const v=assets[2].value;const labels=[];const data=[];const now2=new Date();
+  for(let i=11;i>=0;i--){const d=new Date(now2);d.setMonth(d.getMonth()-i);labels.push(d.toLocaleDateString('en-US',{month:'short'}));data.push(Math.round(v*(0.8+(0.2*(11-i)/11))));}
+  data[data.length-1]=Math.round(v);
+  pvdLine=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,fill:true,tension:.4,backgroundColor:'rgba(63,168,128,.12)',borderColor:'#3fa880',borderWidth:2,pointRadius:0,pointHoverRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtN(c.raw)}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'K'}}}}});
+}
+
+function initInsBar(){
+  const ctx=document.getElementById('insBar');if(!ctx)return;
+  if(insBarChart){insBarChart.destroy();insBarChart=null;}
+  insBarChart=new Chart(ctx,{type:'bar',data:{labels:insurance.map(p=>p.name),datasets:[{label:'Sum Assured',data:insurance.map(p=>p.sumAssured),backgroundColor:'rgba(139,110,212,.4)',borderColor:'#8b6ed4',borderWidth:1.5,borderRadius:4},{label:'Cash Value',data:insurance.map(p=>p.surrenderValue),backgroundColor:'rgba(63,168,128,.4)',borderColor:'#3fa880',borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7c8fa8',font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmtN(c.raw)}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},maxRotation:30}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'K'}}}}});
+}
+
+function _vaCalcTarget(){
+  const VA_BASE=232000;
+  const picker=document.getElementById('vaMonthPicker');
+  const now=new Date();
+  if(picker&&!picker.value)picker.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const selDate=picker&&picker.value?new Date(picker.value+'-01'):now;
+  let target=VA_BASE;
+  let d=new Date(2026,0,1);
+  const end=new Date(selDate.getFullYear(),selDate.getMonth(),1);
+  while(d<=end){target+=6500+(d.getFullYear()-2026)*500;d.setMonth(d.getMonth()+1);}
+  return target;
+}
+
+function updateVACalc(){
+  // save alloc from inputs
+  const tickers=['ADVANC','AOT','AP','BDMS','CPALL','KBANK'];
+  tickers.forEach(t=>{const inp=document.getElementById('va-alloc-'+t);if(inp)VA_ALLOC_CONFIG[t]=parseFloat(inp.value)||0;});
+  localStorage.setItem('va_alloc',JSON.stringify(VA_ALLOC_CONFIG));
+  const target=_vaCalcTarget();
+  let totalTarget=0,totalCurrent=0;
+  let totalTxn=0;
+  tickers.forEach(ticker=>{
+    const alloc=(VA_ALLOC_CONFIG[ticker]||0)/100;
+    const s=stocks.find(k=>k.ticker===ticker);
+    const stockTarget=Math.round(target*alloc);
+    const currentVal=s?Math.round((s.currentPrice||s.avgCost)*s.shares):0;
+    const diff=stockTarget-currentVal;
+    const currentPrice=s?(s.currentPrice||s.avgCost):0;
+    const currentShares2=s?s.shares:0;
+    const sharesNeeded=currentPrice>0?Math.ceil(stockTarget/currentPrice)-currentShares2:0;
+    totalTxn+=sharesNeeded*currentPrice;
+    totalTarget+=stockTarget;totalCurrent+=currentVal;
+    const tEl=document.getElementById('va-target-'+ticker);
+    const aEl=document.getElementById('va-action-'+ticker);
+    const sEl=document.getElementById('va-shares-'+ticker);
+    if(tEl)tEl.textContent=fmtN(stockTarget);
+    if(aEl){
+      const txnAmt=Math.round(Math.abs(sharesNeeded)*currentPrice);
+      aEl.textContent=sharesNeeded===0?'✓ On Track':sharesNeeded>0?'Buy +'+fmtN(txnAmt):'Sell '+fmtN(txnAmt);
+      aEl.style.background=sharesNeeded===0?'rgba(100,116,139,.1)':sharesNeeded>0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)';
+      aEl.style.color=sharesNeeded===0?'var(--text3)':sharesNeeded>0?'var(--em2)':'var(--red)';
+    }
+    if(sEl){
+      sEl.textContent=sharesNeeded===0?'—':(sharesNeeded>0?'+':'')+sharesNeeded.toLocaleString()+' shares';
+      sEl.style.color=sharesNeeded===0?'var(--text3)':sharesNeeded>0?'var(--em2)':'var(--red)';
+    }
+  });
+  const totalDiff=totalTarget-totalCurrent;
+  const netTxn=Math.round(totalTxn);
+  const stEl=document.getElementById('va-sum-target');const scEl=document.getElementById('va-sum-current');
+  const sdEl=document.getElementById('va-sum-diff');const sdLEl=document.getElementById('va-sum-diff-label');
+  if(stEl)stEl.textContent=fmtN(totalTarget);
+  if(scEl)scEl.textContent=fmtN(totalCurrent);
+  if(sdEl){sdEl.textContent=(netTxn>=0?'+':'')+fmtN(netTxn);sdEl.style.color=netTxn>=0?'var(--em2)':'var(--red)';}
+  if(sdLEl)sdLEl.textContent=netTxn>=0?'TO BUY':'TO SELL';
+  const ttEl=document.getElementById('va-total-target');const tcEl=document.getElementById('va-total-current');const taEl=document.getElementById('va-total-action');
+  if(ttEl)ttEl.textContent=fmtN(totalTarget);
+  if(tcEl)tcEl.textContent=fmtN(totalCurrent);
+  if(taEl){taEl.textContent=(netTxn>=0?'Net Buy +':'Net Sell ')+fmtN(Math.abs(netTxn));taEl.style.color=netTxn>=0?'var(--em2)':'var(--red)';taEl.style.background=netTxn>=0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)';}
+}
+
+function renderVACalc(){
+  const card=document.getElementById('vaCalcCard');if(!card)return;
+  const target=_vaCalcTarget();
+  const tickers=['ADVANC','AOT','AP','BDMS','CPALL','KBANK'];
+  const rows=tickers.map((ticker,i)=>{
+    const alloc=(VA_ALLOC_CONFIG[ticker]||0)/100;
+    const s=stocks.find(k=>k.ticker===ticker);
+    const currentPrice=s?(s.currentPrice||s.avgCost):0;
+    const currentShares=s?s.shares:0;
+    const stockTarget=Math.round(target*alloc);
+    const currentVal=s?Math.round(currentPrice*currentShares):0;
+    const diff=stockTarget-currentVal;
+    const sharesNeeded=currentPrice>0?Math.ceil(stockTarget/currentPrice)-currentShares:0;
+    return{ticker,alloc,currentPrice,currentShares,stockTarget,currentVal,diff,sharesNeeded};
+  });
+  const totalTarget=rows.reduce((s,r)=>s+r.stockTarget,0);
+  const totalCurrent=rows.reduce((s,r)=>s+r.currentVal,0);
+  const totalDiff=totalTarget-totalCurrent;
+  const netTxn=Math.round(rows.reduce((s,r)=>s+r.sharesNeeded*r.currentPrice,0));
+  const inputStyle=`width:52px;text-align:center;padding:3px 6px;font-size:13px;font-weight:700;color:var(--blue2);background:rgba(91,150,212,.1);border:1px solid rgba(91,150,212,.25);border-radius:8px;outline:none;font-family:'Inter',sans-serif;`;
+  // ── Summary pills ──
+  document.getElementById('vaSummary').innerHTML=`
+    <div style="flex:1;background:rgba(91,150,212,.08);border:1px solid rgba(91,150,212,.2);border-radius:12px;padding:12px 16px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:6px;">VA TARGET</div>
+      <div id="va-sum-target" style="font-size:22px;font-weight:800;color:var(--blue2);letter-spacing:-1px;">${fmtN(totalTarget)}</div>
+    </div>
+    <div style="flex:1;background:rgba(63,168,128,.08);border:1px solid rgba(63,168,128,.2);border-radius:12px;padding:12px 16px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:6px;">CURRENT VALUE</div>
+      <div id="va-sum-current" style="font-size:22px;font-weight:800;color:var(--em2);letter-spacing:-1px;">${fmtN(totalCurrent)}</div>
+    </div>
+    <div style="flex:1;background:${netTxn>=0?'rgba(63,168,128,.08)':'rgba(217,80,80,.08)'};border:1px solid ${netTxn>=0?'rgba(63,168,128,.2)':'rgba(217,80,80,.2)'};border-radius:12px;padding:12px 16px;">
+      <div id="va-sum-diff-label" style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:6px;">${netTxn>=0?'TO BUY':'TO SELL'}</div>
+      <div id="va-sum-diff" style="font-size:22px;font-weight:800;letter-spacing:-1px;color:${netTxn>=0?'var(--em2)':'var(--red)'};">${netTxn>=0?'+':''}${fmtN(netTxn)}</div>
+    </div>`;
+  // ── Table ──
+  document.getElementById('vaTable').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="font-size:11px;color:var(--text3);border-bottom:2px solid var(--border);">
+        <th style="text-align:left;padding:8px 12px;font-weight:600;">Stock</th>
+        <th style="text-align:center;padding:8px 12px;font-weight:600;">Alloc %</th>
+        <th style="text-align:right;padding:8px 12px;font-weight:600;">Current Price (฿)</th>
+        <th style="text-align:right;padding:8px 12px;font-weight:600;">Current Shares</th>
+        <th style="text-align:right;padding:8px 12px;font-weight:600;">VA Target (฿)</th>
+        <th style="text-align:right;padding:8px 12px;font-weight:600;">Current Value (฿)</th>
+        <th style="text-align:right;padding:8px 12px;font-weight:600;">Shares to Buy/Sell</th>
+        <th style="text-align:right;padding:8px 12px;font-weight:600;">Action</th>
+      </tr></thead>
+      <tbody>${rows.map((r,i)=>{
+        const abs=Math.abs(r.diff);
+        const actBg=r.sharesNeeded===0?'rgba(100,116,139,.1)':r.diff>0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)';
+        const actCol=r.sharesNeeded===0?'var(--text3)':r.diff>0?'var(--em2)':'var(--red)';
+        const txnAmt=Math.round(Math.abs(r.sharesNeeded)*r.currentPrice);
+        const actTxt=r.sharesNeeded===0?'✓ On Track':r.sharesNeeded>0?'Buy +'+fmtN(txnAmt):'Sell '+fmtN(txnAmt);
+        const shareCol=r.sharesNeeded===0?'var(--text3)':r.sharesNeeded>0?'var(--em2)':'var(--red)';
+        const shareTxt=r.sharesNeeded===0?'—':(r.sharesNeeded>0?'+':'')+r.sharesNeeded.toLocaleString()+' shares';
+        return`<tr style="border-bottom:1px solid rgba(0,0,0,.05);background:${i%2?'rgba(0,0,0,.02)':'transparent'};">
+          <td style="padding:10px 12px;"><span style="font-size:14px;font-weight:800;color:var(--blue2);">${r.ticker}</span></td>
+          <td style="padding:10px 12px;text-align:center;">
+            <input id="va-alloc-${r.ticker}" type="number" min="0" max="100" step="1" value="${Math.round(r.alloc*100)}"
+              style="${inputStyle}" onchange="updateVACalc()" oninput="updateVACalc()">
+          </td>
+          <td style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:600;color:var(--text2);">฿${r.currentPrice.toFixed(2)}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:700;color:var(--text);">${r.currentShares.toLocaleString()}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:700;color:var(--text);" id="va-target-${r.ticker}">${fmtN(r.stockTarget)}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:13.5px;color:var(--text2);">${fmtN(r.currentVal)}</td>
+          <td id="va-shares-${r.ticker}" style="padding:10px 12px;text-align:right;font-size:13.5px;font-weight:700;color:${shareCol};">${shareTxt}</td>
+          <td style="padding:10px 12px;text-align:right;">
+            <span id="va-action-${r.ticker}" style="font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:8px;background:${actBg};color:${actCol};">${actTxt}</span>
+          </td>
+        </tr>`;}).join('')}
+        <tr style="border-top:2px solid var(--border);background:rgba(0,0,0,.02);">
+          <td style="padding:10px 12px;font-size:13px;font-weight:700;color:var(--text);" colspan="4">Total</td>
+          <td style="padding:10px 12px;text-align:right;font-size:14px;font-weight:800;color:var(--blue2);" id="va-total-target">${fmtN(totalTarget)}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:14px;font-weight:800;color:var(--em2);" id="va-total-current">${fmtN(totalCurrent)}</td>
+          <td colspan="2" style="padding:10px 12px;text-align:right;">
+            <span id="va-total-action" style="font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:8px;background:${netTxn>=0?'rgba(63,168,128,.12)':'rgba(217,80,80,.12)'};color:${netTxn>=0?'var(--em2)':'var(--red)'};">
+              ${netTxn>=0?'Net Buy +':'Net Sell '}${fmtN(Math.abs(netTxn))}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>`;
+}
+
+function initSectorDonut(){
+  const ctx=document.getElementById('sectorDonut');if(!ctx)return;
+  if(sectorChart){sectorChart.destroy();sectorChart=null;}
+  const sectors={};stocks.forEach(s=>{const v=(s.currentPrice||s.avgCost)*s.shares;sectors[s.sector]=(sectors[s.sector]||0)+v;});
+  const labels=Object.keys(sectors);const data=Object.values(sectors);const colors=labels.map(l=>SECTOR_COLORS[l]||'#94a3b8');
+  const tot=data.reduce((s,v)=>s+v,0);
+  // Sort by value descending
+  const sorted=[...labels.map((l,i)=>({l,v:data[i],c:colors[i]}))].sort((a,b)=>b.v-a.v);
+  const sLabels=sorted.map(x=>x.l),sData=sorted.map(x=>x.v),sColors=sorted.map(x=>x.c);
+  sectorChart=new Chart(ctx,{type:'doughnut',data:{labels:sLabels,datasets:[{data:sData,backgroundColor:sColors.map(c=>c+'cc'),borderColor:sColors,borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmtN(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]/tot>=0.05,color:'#fff',font:{size:11,weight:'700'},textShadowColor:'rgba(0,0,0,.4)',textShadowBlur:4,formatter:(val,ctx)=>{const pct=(val/tot*100).toFixed(1);const lbl=ctx.chart.data.labels[ctx.dataIndex];return lbl+'\n'+pct+'%';},textAlign:'center',anchor:'center',align:'center'}}},plugins:[ChartDataLabels]});
+  const totEl=document.getElementById('sectorTotal');
+  if(totEl)totEl.textContent=fmtN(tot);
+  const legEl=document.getElementById('sectorLegend');
+  if(legEl)legEl.innerHTML=sorted.map(x=>{
+    const pp=(x.v/tot*100).toFixed(1);
+    return`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.05);">
+      <div style="width:10px;height:10px;border-radius:3px;background:${x.c};flex-shrink:0;"></div>
+      <span style="font-size:12px;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${x.l}</span>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">${fmtN(x.v)}</div>
+        <div style="font-size:10px;color:var(--text3);">${pp}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function initReturnBar(){
+  const ctx=document.getElementById('stockReturnBar');if(!ctx)return;
+  if(returnBarChart){returnBarChart.destroy();returnBarChart=null;}
+  const s=stockSummary();
+  const barColors=['#5b96d4','#3fa880','#e07830','#c98f08','#d95050'];
+  returnBarChart=new Chart(ctx,{type:'bar',data:{labels:['Invested','Mkt Value','Sell','Dividends','Tax'],datasets:[{data:[s.invested,s.current,s.sell,s.div,s.tax],backgroundColor:barColors.map(c=>c+'70'),borderColor:barColors,borderWidth:1.5,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ฿'+Math.round(c.raw).toLocaleString()}},datalabels:{anchor:'end',align:'end',offset:2,color:ctx=>barColors[ctx.dataIndex],font:{size:12,weight:'700'},formatter:v=>'฿'+Math.round(v).toLocaleString()}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:11,weight:'600'}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'K'}}}},plugins:[ChartDataLabels]});
+}
+
+// ══════════════ LIVE PRICES ══════════════
+function updateLivePriceRows(){
+  const rowsEl=document.getElementById('livePriceRows');if(!rowsEl)return;
+  rowsEl.innerHTML=COINS.map(c=>{
+    const lp=livePrices[c.sym];
+    if(!lp)return`<div class="price-row shimmer" style="height:64px;"></div>`;
+    const chg=lp.percentChange;const up=chg>=0;
+    return`<div class="price-row"><div style="display:flex;align-items:center;gap:10px;"><div style="width:36px;height:36px;border-radius:10px;background:${c.bg};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:${c.color};">${c.icon}</div><div><div style="font-size:13px;font-weight:700;">${c.name}</div><div style="font-size:11px;color:var(--text3);">${c.abbr}/THB · CoinGecko</div></div></div><div style="margin-left:auto;text-align:right;"><div style="font-size:14px;font-weight:700;color:var(--text1);">฿${Math.round(lp.last).toLocaleString('en-US')}</div><div style="font-size:11px;font-weight:600;color:${up?'#10b981':'#ef4444'};">${up?'+':''}${chg.toFixed(2)}% 24h</div></div></div>`;
+  }).join('');
+}
+
+async function fetchPrices(){
+  const badge=document.getElementById('liveBadge');
+  if(badge)badge.className='live-badge loading';
+  const allIds=[...new Set([
+    ...COINS.map(c=>c.sym),
+    ...cryptoPositions.filter(c=>c.liveKey).map(c=>c.liveKey)
+  ])].join(',');
+  const url=`https://api.coingecko.com/api/v3/simple/price?ids=${allIds}&vs_currencies=thb&include_24hr_change=true`;
+  try{
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    Object.entries(data).forEach(([id,v])=>{
+      livePrices[id]={last:v.thb||0,percentChange:v.thb_24h_change||0};
+    });
+    // Update crypto asset total value
+    const cryptoAsset=assets.find(a=>a.name==='Bitkub Crypto');
+    if(cryptoAsset){
+      const totalVal=cryptoPositions.reduce((s,c)=>{
+        const lk=c.liveKey&&livePrices[c.liveKey];
+        return s+(lk?lk.last*c.units:c.marketPrice*c.units);
+      },0);
+      if(totalVal>0){cryptoAsset.value=Math.round(totalVal);saveAll();}
+    }
+    updateLivePriceRows();
+    if(badge)badge.className='live-badge';
+    const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+    const fetchEl=document.getElementById('lastFetch');if(fetchEl)fetchEl.textContent=now;
+    const liveText=document.getElementById('liveText');if(liveText)liveText.textContent=`⚡ Live · ${now}`;
+    renderDashboard();
+    if(document.getElementById('page-crypto')&&!document.getElementById('page-crypto').classList.contains('hidden')){
+      initCryptoDonut();initCryptoPnlBar();renderCryptoTable();renderCryptoHeatmap();
+    }
+  }catch(e){
+    console.warn('CoinGecko fetch failed:',e.message);
+    if(badge)badge.className='live-badge error';
+    const liveText=document.getElementById('liveText');if(liveText)liveText.textContent='❌ ไม่ได้เชื่อมต่อ';
+  }
+}
+
+function openModal(idx){
+  const a=assets[idx];
+  document.getElementById('editIdx').value=idx;
+  document.getElementById('editName').value=a.name;
+  document.getElementById('editVal').value=a.value||0;
+  document.getElementById('editNote').value='';
+  document.getElementById('editModal').classList.add('open');
+}
+function closeModal(id){
+  const m=document.getElementById(id||'editModal');
+  if(m)m.classList.remove('open');
+}
+function saveEdit(){
+  const idx=parseInt(document.getElementById('editIdx').value);
+  const newVal=parseFloat(document.getElementById('editVal').value)||0;
+  if(newVal>0){assets[idx].value=newVal;saveAll();renderDashboard();setTimeout(initDonut,120);}
+  closeModal('editModal');
+}
+function showToast(msg,dur){
+  const t=document.getElementById('toast');const m=document.getElementById('toastMsg');
+  if(!t||!m)return;m.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur||3000);
+}
+
+// ══════════════ PIN SECURITY ══════════════
+const PIN_KEY='inv_pin_hash';
+const PIN_SALT='inv_pin_salt';
+const PIN_FAIL='inv_pin_fails';
+const PIN_LOCK='inv_pin_lockuntil';
+const AUTO_LOCK_MS=15*60*1000;
+let _pinBuffer='';
+let _pinMode='unlock';
+let _pinSetupFirst='';
+let _autoLockTimer=null;
+let _pinEnabled=true;
+
+async function _sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function _getSalt(){
+  let s=localStorage.getItem(PIN_SALT);
+  if(!s){s=crypto.getRandomValues(new Uint8Array(16)).join('-');localStorage.setItem(PIN_SALT,s);}
+  return s;
+}
+function pinKey(d){
+  if(_pinBuffer.length>=4)return;
+  _pinBuffer+=d;_updateDots();
+  if(_pinBuffer.length===4)setTimeout(_pinSubmit,120);
+}
+function pinDel(){if(_pinBuffer.length>0){_pinBuffer=_pinBuffer.slice(0,-1);_updateDots();}}
+function pinClear(){_pinBuffer='';_updateDots();document.getElementById('pinMsg').textContent='';}
+function _updateDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.classList.toggle('filled',i<_pinBuffer.length);d.classList.remove('error');
+  }
+}
+function _setMsg(msg,color='#ef4444'){const el=document.getElementById('pinMsg');el.textContent=msg;el.style.color=color;}
+function _setPadDisabled(dis){document.querySelectorAll('.pin-btn').forEach(b=>b.disabled=dis);}
+function _pinError(msg){
+  _setMsg(msg);
+  for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');
+  setTimeout(()=>{_pinBuffer='';_updateDots();},400);
+}
+async function _pinSubmit(){
+  const now=Date.now();
+  const lockUntil=parseInt(localStorage.getItem(PIN_LOCK)||'0');
+  if(now<lockUntil){_pinError('ถูกล็อค รอ...');_pinBuffer='';return;}
+  if(_pinMode==='setup1'){
+    _pinSetupFirst=_pinBuffer;_pinBuffer='';
+    document.getElementById('pinTitle').textContent='ยืนยัน PIN';
+    document.getElementById('pinSubtitle').textContent='กรอก PIN อีกครั้งเพื่อยืนยัน';
+    document.getElementById('pinClearBtn').style.display='';
+    _updateDots();_setMsg('');_pinMode='setup2';return;
+  }
+  if(_pinMode==='setup2'){
+    if(_pinBuffer!==_pinSetupFirst){
+      _pinError('PIN ไม่ตรงกัน ลองใหม่');
+      setTimeout(()=>{
+        _pinMode='setup1';_pinSetupFirst='';
+        document.getElementById('pinTitle').textContent='ตั้ง PIN ใหม่';
+        document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลัก';
+        document.getElementById('pinClearBtn').style.display='none';
+        _setMsg('');
+      },800);return;
+    }
+    const hash=await _sha256(_pinBuffer+_getSalt());
+    localStorage.setItem(PIN_KEY,hash);localStorage.removeItem(PIN_FAIL);
+    _pinUnlockApp();return;
+  }
+  const stored=localStorage.getItem(PIN_KEY);
+  const hash=await _sha256(_pinBuffer+_getSalt());
+  if(hash===stored){
+    localStorage.removeItem(PIN_FAIL);_pinUnlockApp();
+  }else{
+    let fails=(parseInt(localStorage.getItem(PIN_FAIL)||'0'))+1;
+    localStorage.setItem(PIN_FAIL,fails);
+    if(fails>=3){
+      const until=Date.now()+30000;
+      localStorage.setItem(PIN_LOCK,until);localStorage.setItem(PIN_FAIL,'0');
+      _setPadDisabled(true);_pinError('กรอกผิด 3 ครั้ง ล็อค 30 วินาที');
+      let rem=30;
+      const iv=setInterval(()=>{
+        rem--;document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
+        if(rem<=0){clearInterval(iv);_setPadDisabled(false);document.getElementById('pinLockMsg').textContent='';_setMsg('');}
+      },1000);
+    }else{
+      _pinError(`PIN ไม่ถูกต้อง (เหลือ ${3-fails} ครั้ง)`);
+    }
+    _pinBuffer='';
+  }
+}
+function _pinUnlockApp(){
+  document.getElementById('pinOverlay').style.display='none';
+  document.getElementById('pinChangeLink').style.display='';
+  _resetAutoLock();
+}
+function pinLockApp(){
+  _pinBuffer='';_updateDots();
+  document.getElementById('pinOverlay').style.display='flex';
+  document.getElementById('pinTitle').textContent='Enter PIN';
+  document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
+  document.getElementById('pinMsg').textContent='';
+  document.getElementById('pinLockMsg').textContent='';
+  _pinMode='unlock';
+  if(_autoLockTimer)clearTimeout(_autoLockTimer);
+}
+function pinStartChange(){
+  _pinBuffer='';_updateDots();_pinSetupFirst='';
+  document.getElementById('pinTitle').textContent='ตั้ง PIN ใหม่';
+  document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักใหม่';
+  document.getElementById('pinClearBtn').style.display='none';
+  document.getElementById('pinMsg').textContent='';
+  document.getElementById('pinChangeLink').style.display='none';
+  document.getElementById('pinOverlay').style.display='flex';
+  _pinMode='setup1';
+}
+function _resetAutoLock(){
+  if(!_pinEnabled)return;
+  if(_autoLockTimer)clearTimeout(_autoLockTimer);
+  _autoLockTimer=setTimeout(pinLockApp,AUTO_LOCK_MS);
+}
+['click','keydown','mousemove','touchstart'].forEach(ev=>{
+  document.addEventListener(ev,()=>{
+    if(_pinEnabled&&document.getElementById('pinOverlay').style.display==='none')_resetAutoLock();
+  },{passive:true});
+});
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('pinOverlay').style.display==='none')return;
+  if(e.key>='0'&&e.key<='9')pinKey(e.key);
+  else if(e.key==='Backspace')pinDel();
+  else if(e.key==='Escape'){_pinBuffer='';_updateDots();}
+});
+function _pinInit(){
+  // PIN disabled — skip directly to app
+  _pinEnabled=false;
+  document.getElementById('pinOverlay').style.display='none';
+  document.getElementById('pinChangeLink').style.display='';
+  return;
+  const overlay=document.getElementById('pinOverlay');
+  overlay.style.display='flex';
+  const hasPin=!!localStorage.getItem(PIN_KEY);
+  if(!hasPin){
+    _pinMode='setup1';
+    document.getElementById('pinTitle').textContent='ตั้ง PIN ครั้งแรก';
+    document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักเพื่อปกป้อง app';
+  }else{
+    _pinMode='unlock';
+    document.getElementById('pinTitle').textContent='Enter PIN';
+    document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
+    const lockUntil=parseInt(localStorage.getItem(PIN_LOCK)||'0');
+    if(Date.now()<lockUntil){
+      _setPadDisabled(true);
+      let rem=Math.ceil((lockUntil-Date.now())/1000);
+      document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
+      const iv=setInterval(()=>{
+        rem--;document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
+        if(rem<=0){clearInterval(iv);_setPadDisabled(false);document.getElementById('pinLockMsg').textContent='';}
+      },1000);
+    }
+  }
+}
+
+// ══════════════ STARTUP ══════════════
+(function(){
+  renderDashboard();
+  setTimeout(()=>{initDonut();initLine(12);initAssetLine(12);},300);
+  fetchPrices();
+  startLivePriceAutoUpdate();
+  _pinInit();
+})();
+</script>
+</body>
+</html>
