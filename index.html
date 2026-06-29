@@ -3168,13 +3168,23 @@ async function syncFromSheets(){
     if(newTxs.length<5)throw new Error('ข้อมูลน้อยเกินไป ('+newTxs.length+' รายการ) — ตรวจสอบสิทธิ์ Google Sheet');
 
     // Derive current asset values from latest "update" transaction per asset
-    // (no need to fetch a second sheet)
+    // Fallback: for deposit-based assets (PVD, Funds, Insurance) sum all buy/deposit transactions
     const latestVals={};
+    const buySums={};
+    const DEPOSIT_ASSETS=new Set(['TISCO PVD','Mutual Funds','AIA Insurance']);
     newTxs.forEach(tx=>{
       if(tx.type==='update'){
         if(!latestVals[tx.asset]||tx.date>=latestVals[tx.asset].date)
           latestVals[tx.asset]={date:tx.date,value:tx.amount};
       }
+      if((tx.type==='buy'||tx.type==='deposit')&&DEPOSIT_ASSETS.has(tx.asset)){
+        buySums[tx.asset]=(buySums[tx.asset]||0)+tx.amount;
+      }
+    });
+    // Fill in fallback: use buy sum if no update transaction found
+    DEPOSIT_ASSETS.forEach(name=>{
+      if(!latestVals[name]&&buySums[name]>0)
+        latestVals[name]={date:'fallback',value:buySums[name]};
     });
 
     // Update assets — skip Crypto (CoinGecko handles live price)
