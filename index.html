@@ -2767,6 +2767,34 @@ function _parseAllTrans(csv){
   return txs;
 }
 
+function _parseAllTransJSONP(table){
+  const assetMap={'Stock':'Krungsri Stock','Crypto':'Bitkub Crypto','GOLD':'Gold MTS','Fund':'Mutual Funds','Provident Fund':'TISCO PVD','Insurance':'AIA Insurance'};
+  const typeMap={'Buy':'buy','Sell':'sell','Deposit':'deposit','Withdraw':'withdraw','Dividend':'dividend','Update':'update'};
+  const txs=[];
+  if(!table||!table.rows)return txs;
+  const cv=(row,i)=>{
+    const cell=row.c&&row.c[i];
+    if(!cell||cell.v==null)return '';
+    if(typeof cell.v==='string'&&cell.v.startsWith('Date(')){
+      const m=cell.v.match(/Date\((\d+),(\d+),(\d+)\)/);
+      if(m){const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return `${+m[3]}-${mo[+m[2]]}-${String(m[1]).slice(2)}`;}
+    }
+    return cell.f!=null?String(cell.f).trim():String(cell.v).trim();
+  };
+  table.rows.forEach(row=>{
+    const yr=cv(row,1),at=cv(row,2),an=cv(row,3),tt=cv(row,4),ex=cv(row,5),ds=cv(row,6),us=cv(row,8),ps=cv(row,9),as=cv(row,12);
+    if(!yr||!yr.match(/^\d{4}$/))return;
+    if(!assetMap[at])return;
+    const dt=_parseDate(ds);if(!dt)return;
+    const amt=_parseAmt(as);if(!amt)return;
+    const units=us?Math.abs(parseFloat(us.replace(/,/g,''))||0):null;
+    const price=ps?Math.abs(parseFloat(ps.replace(/,/g,''))||0):null;
+    txs.push({date:dt,asset:assetMap[at],type:typeMap[tt]||tt.toLowerCase(),amount:amt,note:(an+' '+tt).trim(),coin:an,units:units||null,price:price||null,exchange:ex||null});
+  });
+  txs.sort((a,b)=>a.date.localeCompare(b.date));
+  return txs;
+}
+
 function _parseAssetValues(csv){
   // Parse current values from Dashboard/Summary sheet
   // Format rows: ,[AssetName],"value",pct
@@ -2843,6 +2871,23 @@ function fetchGvizJSONP(sheetId, sheetName){
     script.onerror=()=>{clearTimeout(timer);delete window[cb];resolve(null);};
     script.src=`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json;responseHandler:${cb}&sheet=${encodeURIComponent(sheetName)}`;
     document.head.appendChild(script);
+  });
+}
+
+// Fetch raw gviz table (returns resp.table) — used for AllTrans sync
+function fetchGvizTable(sheetId, sheetName, gid=null){
+  return new Promise(resolve=>{
+    const cb='_gvizTbl'+Date.now();
+    const timer=setTimeout(()=>{delete window[cb];if(s.parentNode)s.remove();resolve(null);},12000);
+    window[cb]=function(resp){
+      clearTimeout(timer);delete window[cb];if(s.parentNode)s.remove();
+      try{resolve(resp&&resp.table?resp.table:null);}catch(e){resolve(null);}
+    };
+    const s=document.createElement('script');
+    s.onerror=()=>{clearTimeout(timer);delete window[cb];resolve(null);};
+    const param=gid?`gid=${gid}`:`sheet=${encodeURIComponent(sheetName||'')}`;
+    s.src=`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json;responseHandler:${cb}&${param}`;
+    document.head.appendChild(s);
   });
 }
 
@@ -3116,14 +3161,11 @@ async function syncFromSheets(){
   if(btn){btn.disabled=true;btn.innerHTML='⟳';btn.style.opacity='.5';}
   if(status)status.textContent='กำลัง sync…';
   try{
-    // Use CORS proxy — docs.google.com blocks direct fetch from sandboxed iframes
-    const sheetUrl=`https://docs.google.com/spreadsheets/d/${_SHEET_ID}/export?format=csv&gid=${_ALLTRANS_GID}`;
-    const proxyUrl='https://corsproxy.io/?url='+encodeURIComponent(sheetUrl);
-    const txResp=await fetch(proxyUrl);
-    if(!txResp.ok)throw new Error('ดึงข้อมูลไม่สำเร็จ ('+txResp.status+')');
-    const txCsv=await txResp.text();
-    const newTxs=_parseAllTrans(txCsv);
-    if(newTxs.length<5)throw new Error('ข้อมูลน้อยเกินไป — ตรวจสอบสิทธิ์ Google Sheet');
+    // Use JSONP — works from file:// and GitHub Pages (no CORS restriction)
+    const table=await fetchGvizTable(_SHEET_ID,null,_ALLTRANS_GID);
+    if(!table)throw new Error('ดึงข้อมูลไม่สำเร็จ — ตรวจสอบสิทธิ์ Google Sheet');
+    const newTxs=_parseAllTransJSONP(table);
+    if(newTxs.length<5)throw new Error('ข้อมูลน้อยเกินไป ('+newTxs.length+' รายการ) — ตรวจสอบสิทธิ์ Google Sheet');
 
     // Derive current asset values from latest "update" transaction per asset
     // (no need to fetch a second sheet)
@@ -3857,57 +3899,4 @@ function pinStartChange(){
 function _resetAutoLock(){
   if(!_pinEnabled)return;
   if(_autoLockTimer)clearTimeout(_autoLockTimer);
-  _autoLockTimer=setTimeout(pinLockApp,AUTO_LOCK_MS);
-}
-['click','keydown','mousemove','touchstart'].forEach(ev=>{
-  document.addEventListener(ev,()=>{
-    if(_pinEnabled&&document.getElementById('pinOverlay').style.display==='none')_resetAutoLock();
-  },{passive:true});
-});
-document.addEventListener('keydown',e=>{
-  if(document.getElementById('pinOverlay').style.display==='none')return;
-  if(e.key>='0'&&e.key<='9')pinKey(e.key);
-  else if(e.key==='Backspace')pinDel();
-  else if(e.key==='Escape'){_pinBuffer='';_updateDots();}
-});
-function _pinInit(){
-  // PIN disabled — skip directly to app
-  _pinEnabled=false;
-  document.getElementById('pinOverlay').style.display='none';
-  document.getElementById('pinChangeLink').style.display='';
-  return;
-  const overlay=document.getElementById('pinOverlay');
-  overlay.style.display='flex';
-  const hasPin=!!localStorage.getItem(PIN_KEY);
-  if(!hasPin){
-    _pinMode='setup1';
-    document.getElementById('pinTitle').textContent='ตั้ง PIN ครั้งแรก';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักเพื่อปกป้อง app';
-  }else{
-    _pinMode='unlock';
-    document.getElementById('pinTitle').textContent='Enter PIN';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
-    const lockUntil=parseInt(localStorage.getItem(PIN_LOCK)||'0');
-    if(Date.now()<lockUntil){
-      _setPadDisabled(true);
-      let rem=Math.ceil((lockUntil-Date.now())/1000);
-      document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
-      const iv=setInterval(()=>{
-        rem--;document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
-        if(rem<=0){clearInterval(iv);_setPadDisabled(false);document.getElementById('pinLockMsg').textContent='';}
-      },1000);
-    }
-  }
-}
-
-// ══════════════ STARTUP ══════════════
-(function(){
-  renderDashboard();
-  setTimeout(()=>{initDonut();initLine(12);initAssetLine(12);},300);
-  fetchPrices();
-  startLivePriceAutoUpdate();
-  _pinInit();
-})();
-</script>
-</body>
-</html>
+  _autoLockTimer=setTimeout
