@@ -3734,11 +3734,9 @@ function showToast(msg,dur){
 
 // ══════════════ PIN SECURITY ══════════════
 (function(){
+  // Clear cached asset values on every load so sync always fetches fresh data
+  localStorage.removeItem('inv_assets');
+  localStorage.removeItem('inv_tx_v2');
+  localStorage.removeItem('inv_last_sync');
   renderDashboard();
-  setTimeout(()=>{initDonut();initLine(12);initAssetLine(12);},300);
-  fetchPrices();
-  startLivePriceAutoUpdate();
-  setTimeout(()=>syncFromSheets(),3000);
-  setInterval(()=>syncFromSheets(),15*60*1000);
-})();
-</script></body></html>
+  setTimeout(()=>{initDonut();
