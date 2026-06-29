@@ -3734,9 +3734,9 @@ function showToast(msg,dur){
 
 // ══════════════ PIN SECURITY ══════════════
 (function(){
-  // Clear cached asset values on every load so sync always fetches fresh data
+  // Always reset assets to DEFAULTS in memory + clear localStorage cache
+  assets = DEFAULTS.map(a=>({...a}));
   localStorage.removeItem('inv_assets');
   localStorage.removeItem('inv_tx_v2');
   localStorage.removeItem('inv_last_sync');
-  renderDashboard();
-  setTimeout(()=>{initDonut();
+  renderDashboard(
