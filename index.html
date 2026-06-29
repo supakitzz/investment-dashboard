@@ -3734,9 +3734,11 @@ function showToast(msg,dur){
 
 // ══════════════ PIN SECURITY ══════════════
 (function(){
-  // Always reset assets to DEFAULTS in memory + clear localStorage cache
-  assets = DEFAULTS.map(a=>({...a}));
-  localStorage.removeItem('inv_assets');
-  localStorage.removeItem('inv_tx_v2');
-  localStorage.removeItem('inv_last_sync');
-  renderDashboard(
+  renderDashboard();
+  setTimeout(()=>{initDonut();initLine(12);initAssetLine(12);},300);
+  fetchPrices();
+  startLivePriceAutoUpdate();
+  syncFromSheets();
+  setInterval(()=>syncFromSheets(),15*60*1000);
+})();
+</script></body></html>                     
