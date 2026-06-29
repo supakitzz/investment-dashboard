@@ -27,41 +27,6 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ── PIN Screen ── */
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #334155;background:transparent;transition:all .15s ease;}
-.pin-dot.filled{background:#F5C842;border-color:#F5C842;box-shadow:0 0 8px rgba(245,200,66,.5);}
-.pin-dot.error{background:#ef4444;border-color:#ef4444;animation:pinShake .35s ease;}
-.pin-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#e2e8f0;font-size:20px;font-weight:600;font-family:'Inter',sans-serif;border-radius:12px;padding:14px;cursor:pointer;transition:all .12s ease;user-select:none;}
-.pin-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);}
-.pin-btn:active{transform:scale(.94);background:rgba(245,200,66,.15);border-color:#F5C842;}
-.pin-btn-del{font-size:16px;}
-.pin-btn-ghost{background:transparent;border-color:transparent;color:#64748b;font-size:13px;}
-.pin-btn-ghost:hover{background:rgba(255,255,255,.05);color:#94a3b8;}
-.pin-btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
-@keyframes pinShake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
-
-:root {
-  --bg:#0D1B2A;--surface:rgba(27,43,58,.95);--surface2:rgba(33,52,71,.98);
-  --glass:rgba(21,35,50,.85);--border:rgba(200,216,232,.1);--border2:rgba(200,216,232,.22);
-  --em:#4FC3A1;--em2:#3DAF8E;--blue:#5B9BD5;--blue2:#4A86C8;--violet:#9B82E4;
-  --orange:#E07830;--amber:#D4A843;--yellow:#F5C842;--red:#E05C5C;--cyan:#4FC3A1;
-  --text:#C8D8E8;--text2:#8BA3B8;--text3:#6B7A9F;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;padding-left:210px;}
-body::before{content:'';position:fixed;inset:0;background:
-  radial-gradient(ellipse 70% 60% at 5% 5%,   rgba(13,45,80,.60),   transparent 55%),
-  radial-gradient(ellipse 55% 50% at 95% 8%,  rgba(30,55,90,.50),   transparent 50%),
-  radial-gradient(ellipse 60% 55% at 80% 90%, rgba(18,50,40,.45),   transparent 55%),
-  radial-gradient(ellipse 65% 50% at 15% 85%, rgba(15,40,70,.50),   transparent 55%),
-  radial-gradient(ellipse 45% 40% at 50% 45%, rgba(212,168,67,.05), transparent 50%);
-pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alternate;}
-@keyframes meshShift{
-  0%  {opacity:1;filter:blur(0px);}
-  50% {opacity:.85;filter:blur(1px);}
-  100%{opacity:1;filter:blur(0px);}
-}
-
 /* NAV SIDEBAR */
 .nav{position:fixed;left:0;top:0;bottom:0;width:210px;z-index:200;background:rgba(10,22,35,.97);backdrop-filter:blur(24px);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;overflow-y:auto;overflow-x:hidden;}
 .nav::-webkit-scrollbar{width:4px;}.nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
@@ -517,56 +482,7 @@ pointer-events:none;z-index:0;animation:meshShift 18s ease-in-out infinite alter
 </head>
 <body>
 
-<!-- ══════════════ PIN OVERLAY ══════════════ -->
-<div id="pinOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#0D1B2A;flex-direction:column;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
-  <!-- Logo -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px;">
-    <svg width="36" height="36" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0D1B2A"/><rect x="5" y="20" width="5" height="7" rx="1.5" fill="#F5C842"/><rect x="13" y="13" width="5" height="14" rx="1.5" fill="#F5C842" opacity=".85"/><rect x="21" y="7" width="5" height="20" rx="1.5" fill="#F5C842" opacity=".7"/></svg>
-    <span style="font-size:20px;font-weight:700;color:#e2e8f0;letter-spacing:-.5px;">InvestTrack</span>
-  </div>
 
-  <!-- Card -->
-  <div style="background:rgba(27,43,58,.95);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px 28px;width:300px;text-align:center;">
-    <!-- Mode title -->
-    <div id="pinTitle" style="font-size:15px;font-weight:600;color:#94a3b8;margin-bottom:6px;">Enter PIN</div>
-    <div id="pinSubtitle" style="font-size:12px;color:#475569;margin-bottom:24px;">กรอก PIN 4 หลักเพื่อเข้าใช้งาน</div>
-
-    <!-- PIN dots -->
-    <div style="display:flex;justify-content:center;gap:14px;margin-bottom:24px;" id="pinDots">
-      <div class="pin-dot" id="pd0"></div>
-      <div class="pin-dot" id="pd1"></div>
-      <div class="pin-dot" id="pd2"></div>
-      <div class="pin-dot" id="pd3"></div>
-    </div>
-
-    <!-- Status message -->
-    <div id="pinMsg" style="font-size:12px;color:#ef4444;min-height:18px;margin-bottom:16px;"></div>
-
-    <!-- Numpad -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;" id="pinPad">
-      <button class="pin-btn" onclick="pinKey('1')">1</button>
-      <button class="pin-btn" onclick="pinKey('2')">2</button>
-      <button class="pin-btn" onclick="pinKey('3')">3</button>
-      <button class="pin-btn" onclick="pinKey('4')">4</button>
-      <button class="pin-btn" onclick="pinKey('5')">5</button>
-      <button class="pin-btn" onclick="pinKey('6')">6</button>
-      <button class="pin-btn" onclick="pinKey('7')">7</button>
-      <button class="pin-btn" onclick="pinKey('8')">8</button>
-      <button class="pin-btn" onclick="pinKey('9')">9</button>
-      <button class="pin-btn pin-btn-ghost" onclick="pinClear()" id="pinClearBtn" style="display:none;">ล้าง</button>
-      <button class="pin-btn" onclick="pinKey('0')">0</button>
-      <button class="pin-btn pin-btn-del" onclick="pinDel()">⌫</button>
-    </div>
-  </div>
-
-  <!-- Lockout timer -->
-  <div id="pinLockMsg" style="margin-top:16px;font-size:12px;color:#64748b;min-height:20px;"></div>
-
-  <!-- Change PIN link (shown when unlocked briefly) -->
-  <div id="pinChangeLink" style="display:none;margin-top:16px;">
-    <button onclick="pinStartChange()" style="background:none;border:none;color:#5b96d4;font-size:12px;cursor:pointer;text-decoration:underline;">เปลี่ยน PIN</button>
-  </div>
-</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"><div class="toast-dot"></div><span id="toastMsg"></span></div>
@@ -3793,152 +3709,11 @@ function showToast(msg,dur){
 }
 
 // ══════════════ PIN SECURITY ══════════════
-const PIN_KEY='inv_pin_hash';
-const PIN_SALT='inv_pin_salt';
-const PIN_FAIL='inv_pin_fails';
-const PIN_LOCK='inv_pin_lockuntil';
-const AUTO_LOCK_MS=15*60*1000;
-let _pinBuffer='';
-let _pinMode='unlock';
-let _pinSetupFirst='';
-let _autoLockTimer=null;
-let _pinEnabled=true;
-
-async function _sha256(str){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-function _getSalt(){
-  let s=localStorage.getItem(PIN_SALT);
-  if(!s){s=crypto.getRandomValues(new Uint8Array(16)).join('-');localStorage.setItem(PIN_SALT,s);}
-  return s;
-}
-function pinKey(d){
-  if(_pinBuffer.length>=4)return;
-  _pinBuffer+=d;_updateDots();
-  if(_pinBuffer.length===4)setTimeout(_pinSubmit,120);
-}
-function pinDel(){if(_pinBuffer.length>0){_pinBuffer=_pinBuffer.slice(0,-1);_updateDots();}}
-function pinClear(){_pinBuffer='';_updateDots();document.getElementById('pinMsg').textContent='';}
-function _updateDots(){
-  for(let i=0;i<4;i++){
-    const d=document.getElementById('pd'+i);
-    d.classList.toggle('filled',i<_pinBuffer.length);d.classList.remove('error');
-  }
-}
-function _setMsg(msg,color='#ef4444'){const el=document.getElementById('pinMsg');el.textContent=msg;el.style.color=color;}
-function _setPadDisabled(dis){document.querySelectorAll('.pin-btn').forEach(b=>b.disabled=dis);}
-function _pinError(msg){
-  _setMsg(msg);
-  for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');
-  setTimeout(()=>{_pinBuffer='';_updateDots();},400);
-}
-async function _pinSubmit(){
-  const now=Date.now();
-  const lockUntil=parseInt(localStorage.getItem(PIN_LOCK)||'0');
-  if(now<lockUntil){_pinError('ถูกล็อค รอ...');_pinBuffer='';return;}
-  if(_pinMode==='setup1'){
-    _pinSetupFirst=_pinBuffer;_pinBuffer='';
-    document.getElementById('pinTitle').textContent='ยืนยัน PIN';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN อีกครั้งเพื่อยืนยัน';
-    document.getElementById('pinClearBtn').style.display='';
-    _updateDots();_setMsg('');_pinMode='setup2';return;
-  }
-  if(_pinMode==='setup2'){
-    if(_pinBuffer!==_pinSetupFirst){
-      _pinError('PIN ไม่ตรงกัน ลองใหม่');
-      setTimeout(()=>{
-        _pinMode='setup1';_pinSetupFirst='';
-        document.getElementById('pinTitle').textContent='ตั้ง PIN ใหม่';
-        document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลัก';
-        document.getElementById('pinClearBtn').style.display='none';
-        _setMsg('');
-      },800);return;
-    }
-    const hash=await _sha256(_pinBuffer+_getSalt());
-    localStorage.setItem(PIN_KEY,hash);localStorage.removeItem(PIN_FAIL);
-    _pinUnlockApp();return;
-  }
-  const stored=localStorage.getItem(PIN_KEY);
-  const hash=await _sha256(_pinBuffer+_getSalt());
-  if(hash===stored){
-    localStorage.removeItem(PIN_FAIL);_pinUnlockApp();
-  }else{
-    let fails=(parseInt(localStorage.getItem(PIN_FAIL)||'0'))+1;
-    localStorage.setItem(PIN_FAIL,fails);
-    if(fails>=3){
-      const until=Date.now()+30000;
-      localStorage.setItem(PIN_LOCK,until);localStorage.setItem(PIN_FAIL,'0');
-      _setPadDisabled(true);_pinError('กรอกผิด 3 ครั้ง ล็อค 30 วินาที');
-      let rem=30;
-      const iv=setInterval(()=>{
-        rem--;document.getElementById('pinLockMsg').textContent=`ลองใหม่ได้ใน ${rem} วินาที`;
-        if(rem<=0){clearInterval(iv);_setPadDisabled(false);document.getElementById('pinLockMsg').textContent='';_setMsg('');}
-      },1000);
-    }else{
-      _pinError(`PIN ไม่ถูกต้อง (เหลือ ${3-fails} ครั้ง)`);
-    }
-    _pinBuffer='';
-  }
-}
-function _pinUnlockApp(){
-  document.getElementById('pinOverlay').style.display='none';
-  document.getElementById('pinChangeLink').style.display='';
-  _resetAutoLock();
-}
-function pinLockApp(){
-  _pinBuffer='';_updateDots();
-  document.getElementById('pinOverlay').style.display='flex';
-  document.getElementById('pinTitle').textContent='Enter PIN';
-  document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
-  document.getElementById('pinMsg').textContent='';
-  document.getElementById('pinLockMsg').textContent='';
-  _pinMode='unlock';
-  if(_autoLockTimer)clearTimeout(_autoLockTimer);
-}
-function pinStartChange(){
-  _pinBuffer='';_updateDots();_pinSetupFirst='';
-  document.getElementById('pinTitle').textContent='ตั้ง PIN ใหม่';
-  document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักใหม่';
-  document.getElementById('pinClearBtn').style.display='none';
-  document.getElementById('pinMsg').textContent='';
-  document.getElementById('pinChangeLink').style.display='none';
-  document.getElementById('pinOverlay').style.display='flex';
-  _pinMode='setup1';
-}
-function _resetAutoLock(){
-  if(!_pinEnabled)return;
-  if(_autoLockTimer)clearTimeout(_autoLockTimer);
-  _autoLockTimer=setTimeout(()=>{pinLockApp();},AUTO_LOCK_MS);
-}
-function _pinInit(){
-  const stored=localStorage.getItem(PIN_KEY);
-  if(!stored){
-    document.getElementById('pinTitle').textContent='ตั้ง PIN';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักเพื่อปกป้องข้อมูล';
-    document.getElementById('pinClearBtn').style.display='none';
-    document.getElementById('pinChangeLink').style.display='none';
-    document.getElementById('pinOverlay').style.display='flex';
-    _pinMode='setup1';
-  }else{
-    document.getElementById('pinTitle').textContent='Enter PIN';
-    document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
-    document.getElementById('pinMsg').textContent='';
-    document.getElementById('pinLockMsg').textContent='';
-    document.getElementById('pinChangeLink').style.display='none';
-    document.getElementById('pinOverlay').style.display='flex';
-    _pinMode='unlock';
-  }
-  ['click','mousemove','keydown','touchstart'].forEach(ev=>{
-    document.addEventListener(ev,_resetAutoLock,{passive:true});
-  });
-}
 (function(){
   renderDashboard();
   setTimeout(()=>{initDonut();initLine(12);initAssetLine(12);},300);
   fetchPrices();
   startLivePriceAutoUpdate();
-  _pinInit();
   setTimeout(()=>syncFromSheets(),3000);
   setInterval(()=>syncFromSheets(),15*60*1000);
 })();
