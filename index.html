@@ -1320,7 +1320,7 @@ let _priceSheetName=localStorage.getItem('_priceSheetName')||'Stock-Symbol';
 const DEFAULTS=[
   {name:'Krungsri Stock',value:333397,color:'#3b82f6',icon:'📊',bg:'rgba(59,130,246,.12)'},
   {name:'AIA Insurance', value:323280,color:'#8b5cf6',icon:'🛡️',bg:'rgba(139,92,246,.12)'},
-  {name:'TISCO PVD',     value:268184,color:'#10b981',icon:'🏦',bg:'rgba(16,185,129,.12)'},
+  {name:'TISCO PVD',     value:279312,color:'#10b981',icon:'🏦',bg:'rgba(16,185,129,.12)'},
   {name:'Mutual Funds',  value:88203, color:'#f59e0b',icon:'📈',bg:'rgba(245,158,11,.12)'},
   {name:'Bitkub Crypto', value:39714, color:'#f97316',icon:'₿', bg:'rgba(249,115,22,.12)'},
   {name:'Gold MTS',      value:7912,  color:'#eab308',icon:'🥇',bg:'rgba(234,179,8,.12)'},
@@ -3909,4 +3909,37 @@ function pinStartChange(){
 function _resetAutoLock(){
   if(!_pinEnabled)return;
   if(_autoLockTimer)clearTimeout(_autoLockTimer);
-  _autoLockTimer=setTimeout
+  _autoLockTimer=setTimeout(()=>{pinLockApp();},AUTO_LOCK_MS);
+}
+function _pinInit(){
+  const stored=localStorage.getItem(PIN_KEY);
+  if(!stored){
+    document.getElementById('pinTitle').textContent='ตั้ง PIN';
+    document.getElementById('pinSubtitle').textContent='กรอก PIN 4 หลักเพื่อปกป้องข้อมูล';
+    document.getElementById('pinClearBtn').style.display='none';
+    document.getElementById('pinChangeLink').style.display='none';
+    document.getElementById('pinOverlay').style.display='flex';
+    _pinMode='setup1';
+  }else{
+    document.getElementById('pinTitle').textContent='Enter PIN';
+    document.getElementById('pinSubtitle').textContent='กรอก PIN เพื่อเข้าใช้งาน';
+    document.getElementById('pinMsg').textContent='';
+    document.getElementById('pinLockMsg').textContent='';
+    document.getElementById('pinChangeLink').style.display='none';
+    document.getElementById('pinOverlay').style.display='flex';
+    _pinMode='unlock';
+  }
+  ['click','mousemove','keydown','touchstart'].forEach(ev=>{
+    document.addEventListener(ev,_resetAutoLock,{passive:true});
+  });
+}
+(function(){
+  renderDashboard();
+  setTimeout(()=>{initDonut();initLine(12);initAssetLine(12);},300);
+  fetchPrices();
+  startLivePriceAutoUpdate();
+  _pinInit();
+  setTimeout(()=>syncFromSheets(),3000);
+  setInterval(()=>syncFromSheets(),15*60*1000);
+})();
+</script></body></html>
