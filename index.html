@@ -111,7 +111,7 @@ body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter
 }
 
 /* PAGES */
-.page{display:none;padding:clamp(12px,3vw,24px) clamp(10px,2.5vw,20px) 36px;max-width:min(1400px,100%);margin:0 auto;position:relative;z-index:1;box-sizing:border-box;}
+.page{display:none;padding:clamp(12px,3vw,24px) clamp(10px,2.5vw,20px) 36px;max-width:min(1400px,100%);margin:0 auto;margin-left:210px;position:relative;z-index:1;box-sizing:border-box;}
 .page.active{display:block;}
 
 /* GRID */
@@ -500,7 +500,7 @@ body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter
 
 /* ── ENSURE .page CONTENT IS NOT HIDDEN ON MOBILE ── */
 @media(max-width:700px){
-  .page{padding-bottom:80px;}
+  .page{padding-bottom:80px;margin-left:0;}
 }
 </style>
 </head>
