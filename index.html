@@ -3230,7 +3230,7 @@ async function syncFromSheets(){
 
 // ===== Line / Asset Trend Charts =====
 function initLine(months){
-  months=months||12;
+  months=months??12;
   const ctx=document.getElementById('lineChart');if(!ctx)return;
   if(lineChart){lineChart.destroy();lineChart=null;}
   // Update range button styles
