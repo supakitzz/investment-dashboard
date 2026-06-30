@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <!-- gridjs mermaid.min.css replaced with custom dark theme -->
 <style>
+/* ===== Gridjs Table Theming ===== */
 .gridjs-container{color:var(--text);background:transparent!important;}
 .gridjs-wrapper{background:transparent!important;border:1px solid var(--border)!important;border-radius:12px!important;overflow:hidden!important;box-shadow:none!important;}
 .gridjs-table{width:100%;border-collapse:collapse;background:transparent!important;}
@@ -22,9 +23,8 @@
 .gridjs-sort-none::after{content:'↕';font-size:10px;}
 .gridjs-sort-asc::after{content:'↑';font-size:10px;}
 .gridjs-sort-desc::after{content:'↓';font-size:10px;}
-</style>
-<script src="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/gridjs.umd.js"></script>
-<style>
+
+/* ===== Base / Reset / Root Variables ===== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 :root{
   --bg:#0D1B2A;
@@ -51,6 +51,7 @@
 }
 body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter',sans-serif;}
 
+/* ===== Layout / Navigation ===== */
 /* NAV SIDEBAR */
 .nav{position:fixed;left:0;top:0;bottom:0;width:210px;z-index:200;background:rgba(10,22,35,.97);backdrop-filter:blur(24px);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;overflow-y:auto;overflow-x:hidden;}
 .nav::-webkit-scrollbar{width:4px;}.nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
@@ -124,6 +125,7 @@ body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter
 .mb2{margin-bottom:6px;}.mb4{margin-bottom:12px;}.mb6{margin-bottom:18px;}
 .flex-btw{display:flex;justify-content:space-between;align-items:center;}
 
+/* ===== Cards / Tables ===== */
 /* CARD */
 .card{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px;backdrop-filter:blur(12px);transition:border-color .25s;}
 .card:hover{border-color:var(--border2);}
@@ -267,6 +269,7 @@ body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter
 .holding-qty-input:focus{border-color:rgba(245,200,66,.4);}
 .holding-val{font-size:13px;font-weight:700;min-width:90px;text-align:right;}
 
+/* ===== Components (Forms / Buttons / Modal / Toast) ===== */
 /* FORM */
 .form-label{font-size:11.5px;font-weight:600;color:var(--text3);letter-spacing:.3px;margin-bottom:6px;display:block;}
 .form-input,.form-select,.form-textarea{width:100%;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-size:13.5px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s,background .2s;}
@@ -337,6 +340,7 @@ body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter
 .gridjs-search input{background:rgba(255,255,255,.07)!important;border:1px solid var(--border)!important;border-radius:10px!important;color:var(--text)!important;padding:8px 13px!important;font-size:13px!important;font-family:'Inter',sans-serif!important;}
 .gridjs-search input::placeholder{color:var(--text3)!important;}
 
+/* ===== Animations ===== */
 /* ANIM */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 .fade{animation:fadeUp .45s cubic-bezier(.4,0,.2,1) both;}
@@ -503,6 +507,7 @@ body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter
   .page{padding-bottom:80px;}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/gridjs.umd.js"></script>
 </head>
 <body>
 
@@ -1317,6 +1322,8 @@ const DEFAULT_GOLD=[
   {id:'g1',name:'Gold MTS',weight:1.67697,avgPrice:4472.35,marketPrice:4712.80,unit:'g'},
 ];
 
+// ===== Storage / Utility Helpers =====
+const sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const ld=(k,d)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):d;}catch{return d;}};
 // Version-stamp migration: force-reload defaults on every major schema update
 const _DATA_VER='v5-2026-06-19c';
@@ -1342,6 +1349,7 @@ let refreshIntervalSec=900;
 let countdownTimer=null;
 let nextRefreshAt=null;
 
+// ===== Save / Aggregate Calculation Helpers =====
 const saveAll=()=>{
   localStorage.setItem('inv_assets',JSON.stringify(assets));
   localStorage.setItem('inv_tx_v2',JSON.stringify(transactions));
@@ -1361,6 +1369,7 @@ const now=new Date();
 document.getElementById('heroDate').textContent=now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
 // ══════════════ NAV ══════════════
+// ===== Navigation / UI Helpers =====
 function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
@@ -1411,6 +1420,7 @@ function saveCashBalance(val){
   renderStockPage();
 }
 
+// ===== Stock Page Rendering =====
 function renderStockPage(){
   const s=stockSummary();
   const grandTotal=s.current+cashBalance;
@@ -1582,6 +1592,7 @@ function deleteStock(id){
 let _cryptoTxPage=0;
 let _cryptoTxFilterType='';
 let _cryptoTxFilterSym='';
+// ===== Crypto Page Rendering =====
 function renderCryptoTxTable(page=0,filterType,filterSym){
   if(filterType!==undefined)_cryptoTxFilterType=filterType;
   if(filterSym!==undefined)_cryptoTxFilterSym=filterSym;
@@ -1721,6 +1732,7 @@ function renderCryptoTxTable(page=0,filterType,filterSym){
 
 // ══════════════ STOCK HEATMAP ══════════════
 let _shmMode='pnl';
+// ===== Heatmap Rendering =====
 function renderStockHeatmap(mode){
   if(mode)_shmMode=mode;
   const el=document.getElementById('stockHeatmap');if(!el)return;
@@ -1953,6 +1965,7 @@ function renderCryptoTable(){
 
 // ══════════════ PVD CHARTS ══════════════
 
+// ===== PVD / Insurance Charts & Tables =====
 function initPvdGrowthLine(){
   const ctx=document.getElementById('pvdGrowthLine');if(!ctx)return;
   if(pvdGrowthChart){pvdGrowthChart.destroy();pvdGrowthChart=null;}
@@ -2170,6 +2183,7 @@ function renderPvdTable(){
 }
 
 // ══════════════ FUND NAV EDIT ══════════════
+// ===== Funds / Gold Page Rendering =====
 function renderFundNavInputs(){
   const el=document.getElementById('fundNavInputs');if(!el)return;
   el.innerHTML=funds.map(f=>`
@@ -2325,6 +2339,7 @@ function renderHoldingsInputs(){}
 function renderCrypto24h(){}
 
 // ══════════════ DASHBOARD ══════════════
+// ===== Dashboard Rendering =====
 function renderDashboard(){
   const t=total();
   const heroEl=document.getElementById('heroValue');if(heroEl)countUp(heroEl,t);
@@ -2456,6 +2471,7 @@ function renderRecentTx(){
 let _stockTxPage=0;
 let _stockTxFilterType='';
 let _stockTxFilterSym='';
+// ===== Transaction Table Rendering =====
 function renderStockTxPaged(page=0,filterType,filterSym){
   // preserve filters if not explicitly passed
   if(filterType!==undefined)_stockTxFilterType=filterType;
@@ -2632,6 +2648,7 @@ function renderPageTx(assetName, elId, limit=50){
   </table>`;
 }
 
+// ===== Chart Rendering =====
 function renderCharts(id){
   if(id==='dashboard'){renderDashboard();setTimeout(()=>{initDonut();initLine();initAssetLine(12);},120);setTimeout(()=>fetchLivePrices(true),500);}
   if(id==='crypto')setTimeout(()=>{initCryptoDonut();},120);
@@ -2682,6 +2699,7 @@ function initDonut(){
 const _SHEET_ID='1qXbouGEvu-LpwzoUO5PonamX1QiaA9sYekvFmP1C5Ao';
 const _ALLTRANS_GID='996606651';
 
+// ===== CSV / Data Parsing Utilities =====
 function _parseCSVRow(r){const c=[];let s='',q=false;for(let i=0;i<r.length;i++){if(r[i]==='"'){q=!q;}else if(r[i]===','&&!q){c.push(s.trim());s='';}else s+=r[i];}c.push(s.trim());return c;}
 function _parseAmt(s){return Math.round(Math.abs(parseFloat((s||'0').replace(/,/g,'').replace('\\-','-').replace(/\s/g,''))||0)*100)/100;}
 function _parseDate(s){const ms={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};const[d,m,y]=(s||'').trim().split('-');if(!d||!m||!y||!ms.hasOwnProperty(m))return null;return new Date(+y,ms[m],+d).toISOString().split('T')[0];}
@@ -2767,6 +2785,7 @@ function _computeSnapshots(txs){
 // ── GOOGLE SHEET PRICE FEED ──────────────────────────────────────
 
 // JSONP fetch — works from file:// protocol (no CORS restriction via <script> tag)
+// ===== JSONP / Google Sheets Fetch Logic =====
 function fetchGvizJSONP(sheetId, sheetName){
   return new Promise(resolve=>{
     const cb='_gvizCb'+Date.now();
@@ -2952,6 +2971,7 @@ function updateStockPriceSourceLabel(source){
   if(el)el.textContent=source==='sheet'?'📈 หุ้นไทย · Google Sheet':'📈 หุ้นไทย · Yahoo Finance';
 }
 
+// ===== Live Price Fetching / Auto-Update =====
 async function fetchLivePrices(silent=false){
   const btn=document.getElementById('livePriceBtn');
   const label=document.getElementById('priceSourceLabel');
@@ -3028,6 +3048,7 @@ function startLivePriceAutoUpdate(){
 }
 
 // ── SETTINGS MODAL ────────────────────────────────────────────────
+// ===== Settings Modal / Price Sheet Config =====
 function openSettingsModal(){
   const urlInp=document.getElementById('priceSheetUrlInput');
   const nameInp=document.getElementById('priceSheetNameInput');
@@ -3174,6 +3195,7 @@ async function syncFromSheets(){
   }
 })();
 
+// ===== Line / Asset Trend Charts =====
 function initLine(months){
   months=months||12;
   const ctx=document.getElementById('lineChart');if(!ctx)return;
@@ -3415,6 +3437,7 @@ function _assetToggle(idx){
   assetLineChart.update();
 }
 
+// ===== Donut / Bar Chart Initializers =====
 function initCryptoDonut(){
   const ctx=document.getElementById('cryptoDonut');if(!ctx)return;
   if(cryptoDonut){cryptoDonut.destroy();cryptoDonut=null;}
@@ -3478,6 +3501,7 @@ function initInsBar(){
   insBarChart=new Chart(ctx,{type:'bar',data:{labels:insurance.map(p=>p.name),datasets:[{label:'Sum Assured',data:insurance.map(p=>p.sumAssured),backgroundColor:'rgba(139,110,212,.4)',borderColor:'#8b6ed4',borderWidth:1.5,borderRadius:4},{label:'Cash Value',data:insurance.map(p=>p.surrenderValue),backgroundColor:'rgba(63,168,128,.4)',borderColor:'#3fa880',borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7c8fa8',font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmtN(c.raw)}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},maxRotation:30}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'฿'+Math.round(v/1000)+'K'}}}}});
 }
 
+// ===== VA Calculator Logic =====
 function _vaCalcTarget(){
   const VA_BASE=232000;
   const picker=document.getElementById('vaMonthPicker');
@@ -3658,6 +3682,7 @@ function initReturnBar(){
 }
 
 // ══════════════ LIVE PRICES ══════════════
+// ===== Price Row Updates / Modal Handlers =====
 function updateLivePriceRows(){
   const rowsEl=document.getElementById('livePriceRows');if(!rowsEl)return;
   rowsEl.innerHTML=COINS.map(c=>{
@@ -3739,6 +3764,4 @@ function showToast(msg,dur){
   fetchPrices();
   startLivePriceAutoUpdate();
   syncFromSheets();
-  setInterval(()=>syncFromSheets(),15*60*1000);
-})();
-</script></body></html>                     
+  setInterval(()=>
