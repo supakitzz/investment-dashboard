@@ -3764,4 +3764,6 @@ function showToast(msg,dur){
   fetchPrices();
   startLivePriceAutoUpdate();
   syncFromSheets();
-  setInterval(()=>
+  setInterval(()=>syncFromSheets(),15*60*1000);
+})();
+</script></body></html>
