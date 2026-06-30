@@ -3151,37 +3151,43 @@ async function syncFromSheets(){
   if(status)status.textContent='กำลัง sync…';
   try{
     // Use JSONP — works from file:// and GitHub Pages (no CORS restriction)
-    const table=await fetchGvizTable(_SHEET_ID,null,_ALLTRANS_GID);
+    const [table, dashTable] = await Promise.all([
+      fetchGvizTable(_SHEET_ID,null,_ALLTRANS_GID),
+      fetchGvizTable(_SHEET_ID,'Dashboard',null)
+    ]);
     if(!table)throw new Error('ดึงข้อมูลไม่สำเร็จ — ตรวจสอบสิทธิ์ Google Sheet');
     const newTxs=_parseAllTransJSONP(table);
     if(newTxs.length<5)throw new Error('ข้อมูลน้อยเกินไป ('+newTxs.length+' รายการ) — ตรวจสอบสิทธิ์ Google Sheet');
 
-    // Derive current asset values from latest "update" transaction per asset
-    // Fallback: for deposit-based assets (PVD, Funds, Insurance) sum all buy/deposit transactions
+    // Derive current asset values from Dashboard sheet (col13=Asset, col14=Value)
+    // This gives accurate market values (NAV, live price) instead of cost basis
+    const dashNameMap={'[AIA] Insurance':'AIA Insurance','[Krungsri] Stock':'Krungsri Stock','[TISCO] Provident Fund':'TISCO PVD','[Bitkub] Crypto':'Bitkub Crypto','Mutual funds':'Mutual Funds','Gold':'Gold MTS'};
     const latestVals={};
-    const buySums={};
-    const DEPOSIT_ASSETS=new Set(['TISCO PVD','Mutual Funds','AIA Insurance','Gold MTS']);
-    newTxs.forEach(tx=>{
-      if(tx.type==='update'){
-        if(!latestVals[tx.asset]||tx.date>=latestVals[tx.asset].date)
-          latestVals[tx.asset]={date:tx.date,value:tx.amount};
-      }
-      if((tx.type==='buy'||tx.type==='deposit')&&DEPOSIT_ASSETS.has(tx.asset)){
-        buySums[tx.asset]=(buySums[tx.asset]||0)+tx.amount;
-      }
-    });
-    // Fill in fallback: use buy sum if no update transaction found
-    DEPOSIT_ASSETS.forEach(name=>{
-      if(!latestVals[name]&&buySums[name]>0)
-        latestVals[name]={date:'fallback',value:buySums[name]};
-    });
-
-    // Update assets — skip Crypto (CoinGecko handles live price)
-    if(Object.keys(latestVals).length>0){
-      assets=assets.map(a=>{
-        if(a.name==='Bitkub Crypto')return a;
-        return latestVals[a.name]?{...a,value:latestVals[a.name].value}:a;
+    if(dashTable&&dashTable.rows){
+      dashTable.rows.forEach(row=>{
+        const name=row.c&&row.c[13]&&row.c[13].v;
+        const val=row.c&&row.c[14]&&row.c[14].v;
+        if(name&&val!=null&&dashNameMap[name])
+          latestVals[dashNameMap[name]]={date:'dashboard',value:val};
       });
+    }
+    // Fallback: sum buy/deposit transactions for assets not in Dashboard
+    if(Object.keys(latestVals).length===0){
+      const DEPOSIT_ASSETS=new Set(['TISCO PVD','Mutual Funds','AIA Insurance','Gold MTS']);
+      newTxs.forEach(tx=>{
+        if(tx.type==='update'){
+          if(!latestVals[tx.asset]||tx.date>=latestVals[tx.asset].date)
+            latestVals[tx.asset]={date:tx.date,value:tx.amount};
+        }
+      });
+      const buySums={};
+      newTxs.filter(t=>t.type==='buy'||t.type==='deposit').forEach(t=>{buySums[t.asset]=(buySums[t.asset]||0)+t.amount;});
+      DEPOSIT_ASSETS.forEach(name=>{if(!latestVals[name]&&buySums[name]>0)latestVals[name]={date:'fallback',value:buySums[name]};});
+    }
+
+    // Update assets using Dashboard values (all assets including Crypto)
+    if(Object.keys(latestVals).length>0){
+      assets=assets.map(a=>latestVals[a.name]?{...a,value:latestVals[a.name].value}:a);
       sv('inv_assets',assets);
     }
 
