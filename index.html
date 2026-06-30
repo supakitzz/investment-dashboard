@@ -2805,6 +2805,8 @@ function _computeSnapshots(txs, curAssets){
     const curTot=curAssets.reduce((s,a)=>s+(a.value||0),0);
     snaps[curYM]=Math.round(curTot);
   }
+  // Remove entries with year < 2000 (wrong-date artifacts from Buddhist-calendar dates)
+  Object.keys(snaps).forEach(ym=>{if(parseInt(ym)<2000)delete snaps[ym];});
   return snaps;
 }
 
