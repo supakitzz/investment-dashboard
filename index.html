@@ -2727,8 +2727,8 @@ function _parseAllTrans(csv){
 }
 
 function _parseAllTransJSONP(table){
-  const assetMap={'Stock':'Krungsri Stock','Crypto':'Bitkub Crypto','GOLD':'Gold MTS','Fund':'Mutual Funds','Provident Fund':'TISCO PVD','Insurance':'AIA Insurance'};
-  const typeMap={'Buy':'buy','Sell':'sell','Deposit':'deposit','Withdraw':'withdraw','Dividend':'dividend','Update':'update'};
+  const assetMap={'Stock':'Krungsri Stock','Crypto':'Bitkub Crypto','GOLD':'Gold MTS','Gold':'Gold MTS','Fund':'Mutual Funds','Provident Fund':'TISCO PVD','Insurance':'AIA Insurance'};
+  const typeMap={'Buy':'buy','Sell':'sell','Deposit':'deposit','Withdraw':'withdraw','Dividend':'dividend','Update':'update','Convert':'convert','Interest':'interest','Staking':'staking','Loss':'loss'};
   const txs=[];
   if(!table||!table.rows)return txs;
   const cv=(row,i)=>{
