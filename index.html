@@ -3183,10 +3183,11 @@ async function syncFromSheets(){
       sv('inv_assets',assets);
     }
 
-    // Merge: keep non-PVD embedded transactions, replace only the synced asset's rows
+    // Merge: keep non-synced assets from DEFAULT_TRANSACTIONS (full embedded history)
     const syncedAssets=new Set(newTxs.map(t=>t.asset));
-    const kept=transactions.filter(t=>!syncedAssets.has(t.asset));
-    transactions=[...kept,...newTxs].sort((a,b)=>a.date.localeCompare(b.date));
+    const baseDefault=(typeof DEFAULT_TRANSACTIONS!=='undefined'?DEFAULT_TRANSACTIONS:transactions)
+      .filter(t=>!syncedAssets.has(t.asset));
+    transactions=[...baseDefault,...newTxs].sort((a,b)=>a.date.localeCompare(b.date));
 
     // Compute monthly snapshots + save
     const snaps=_computeSnapshots(transactions,assets);
