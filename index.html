@@ -2771,15 +2771,40 @@ function _parseAssetValues(csv){
   return vals;
 }
 
-function _computeSnapshots(txs){
-  const monthly={};
-  txs.forEach(tx=>{
+function _computeSnapshots(txs, curAssets){
+  // Per-asset running balance (buy/deposit add, sell/withdraw subtract, update overrides)
+  const IGNORE=new Set(['dividend','convert','interest','staking','loss','fee']);
+  const assetRun={};    // asset -> current running value
+  const ymData={};      // ym -> {asset -> value}
+
+  const sorted=[...txs].sort((a,b)=>a.date.localeCompare(b.date));
+  sorted.forEach(tx=>{
+    if(!tx.date||tx.date.length<7)return;
+    if(IGNORE.has(tx.type))return;
     const ym=tx.date.substring(0,7);
-    const sign=(tx.type==='sell'||tx.type==='withdraw')?-1:1;
-    monthly[ym]=(monthly[ym]||0)+sign*tx.amount;
+    const prev=assetRun[tx.asset]||0;
+    if(tx.type==='update')          assetRun[tx.asset]=tx.amount;
+    else if(tx.type==='buy'||tx.type==='deposit') assetRun[tx.asset]=prev+tx.amount;
+    else if(tx.type==='sell'||tx.type==='withdraw') assetRun[tx.asset]=Math.max(0,prev-tx.amount);
+    if(!ymData[ym])ymData[ym]={};
+    ymData[ym][tx.asset]=assetRun[tx.asset];
   });
-  let running=0;const snaps={};
-  Object.keys(monthly).sort().forEach(ym=>{running+=monthly[ym];snaps[ym]=Math.round(running);});
+
+  // For each ym, sum latest-known value of every asset
+  const latestKnown={};
+  const snaps={};
+  Object.keys(ymData).sort().forEach(ym=>{
+    Object.entries(ymData[ym]).forEach(([a,v])=>{latestKnown[a]=v;});
+    const tot=Object.values(latestKnown).reduce((s,v)=>s+v,0);
+    if(tot>0)snaps[ym]=Math.round(tot);
+  });
+
+  // Override current month with actual live total (includes market prices)
+  if(curAssets&&curAssets.length){
+    const curYM=new Date().toISOString().substring(0,7);
+    const curTot=curAssets.reduce((s,a)=>s+(a.value||0),0);
+    snaps[curYM]=Math.round(curTot);
+  }
   return snaps;
 }
 
@@ -3158,9 +3183,13 @@ async function syncFromSheets(){
       sv('inv_assets',assets);
     }
 
+    // Merge: keep non-PVD embedded transactions, replace only the synced asset's rows
+    const syncedAssets=new Set(newTxs.map(t=>t.asset));
+    const kept=transactions.filter(t=>!syncedAssets.has(t.asset));
+    transactions=[...kept,...newTxs].sort((a,b)=>a.date.localeCompare(b.date));
+
     // Compute monthly snapshots + save
-    const snaps=_computeSnapshots(newTxs);
-    transactions=newTxs;
+    const snaps=_computeSnapshots(transactions,assets);
     sv('inv_tx_v2',transactions);
     localStorage.setItem('inv_snapshots',JSON.stringify(snaps));
     localStorage.setItem('inv_last_sync',new Date().toISOString());
