@@ -2706,8 +2706,8 @@ function _parseAmt(s){return Math.round(Math.abs(parseFloat((s||'0').replace(/,/
 function _parseDate(s){const ms={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};const[d,m,y]=(s||'').trim().split('-');if(!d||!m||!y||!ms.hasOwnProperty(m))return null;return new Date(+y,ms[m],+d).toISOString().split('T')[0];}
 
 function _parseAllTrans(csv){
-  const assetMap={'Stock':'Krungsri Stock','Crypto':'Bitkub Crypto','GOLD':'Gold MTS','Fund':'Mutual Funds','Provident Fund':'TISCO PVD','Insurance':'AIA Insurance'};
-  const typeMap={'Buy':'buy','Sell':'sell','Deposit':'deposit','Withdraw':'withdraw','Dividend':'dividend','Update':'update'};
+  const assetMap={'Stock':'Krungsri Stock','Crypto':'Bitkub Crypto','GOLD':'Gold MTS','Gold':'Gold MTS','Fund':'Mutual Funds','Provident Fund':'TISCO PVD','Insurance':'AIA Insurance'};
+  const typeMap={'Buy':'buy','Sell':'sell','Deposit':'deposit','Withdraw':'withdraw','Dividend':'dividend','Update':'update','Convert':'convert','Interest':'interest','Staking':'staking','Loss':'loss'};
   const txs=[];
   csv.split('\n').forEach(line=>{
     const c=_parseCSVRow(line);
@@ -2736,7 +2736,7 @@ function _parseAllTransJSONP(table){
     if(!cell||cell.v==null)return '';
     if(typeof cell.v==='string'&&cell.v.startsWith('Date(')){
       const m=cell.v.match(/Date\((\d+),(\d+),(\d+)\)/);
-      if(m){const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return `${+m[3]}-${mo[+m[2]]}-${String(m[1]).slice(2)}`;}
+      if(m){const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return `${+m[3]}-${mo[+m[2]]}-${m[1]}`;}
     }
     return cell.f!=null?String(cell.f).trim():String(cell.v).trim();
   };
@@ -3160,7 +3160,7 @@ async function syncFromSheets(){
     // Fallback: for deposit-based assets (PVD, Funds, Insurance) sum all buy/deposit transactions
     const latestVals={};
     const buySums={};
-    const DEPOSIT_ASSETS=new Set(['TISCO PVD','Mutual Funds','AIA Insurance']);
+    const DEPOSIT_ASSETS=new Set(['TISCO PVD','Mutual Funds','AIA Insurance','Gold MTS']);
     newTxs.forEach(tx=>{
       if(tx.type==='update'){
         if(!latestVals[tx.asset]||tx.date>=latestVals[tx.asset].date)
