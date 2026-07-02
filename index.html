@@ -1319,7 +1319,7 @@ const DEFAULT_GOLD=[
 
 const ld=(k,d)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):d;}catch{return d;}};
 // Version-stamp migration: force-reload defaults on every major schema update
-const _DATA_VER='v6-2026-06-30';
+const _DATA_VER='v7-2026-07-02';
 if(localStorage.getItem('inv_data_ver')!==_DATA_VER){
   ['inv_assets','inv_stocks','inv_crypto','inv_insurance','inv_funds','inv_gold','inv_tx_v2'].forEach(k=>localStorage.removeItem(k));
   localStorage.setItem('inv_data_ver',_DATA_VER);
@@ -3149,6 +3149,18 @@ async function syncFromSheets(){
     }
 
     // Scale gold marketPrice so Gold page matches Dashboard total exactly
+    // Recompute gold weight from all buy transactions (so new purchases are reflected)
+    const goldBuys=newTxs.filter(t=>t.asset==='Gold MTS'&&t.type==='buy');
+    if(goldBuys.length>0&&gold.length>0){
+      const totalWeight=goldBuys.reduce((s,t)=>s+(t.units||0),0);
+      const totalCost=goldBuys.reduce((s,t)=>s+t.amount,0);
+      if(totalWeight>0){
+        const avgPrice=totalCost>0?Math.round(totalCost/totalWeight*100)/100:gold[0].avgPrice;
+        gold=gold.map(g=>({...g,weight:Math.round(totalWeight*10000)/10000,avgPrice}));
+        sv('inv_gold',gold);
+      }
+    }
+
     const syncedGold=latestVals['Gold MTS']?.value;
     if(syncedGold&&gold.length>0){
       const curGoldTotal=gold.reduce((s,g)=>s+g.weight*g.marketPrice,0);
