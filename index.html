@@ -3148,6 +3148,17 @@ async function syncFromSheets(){
       }
     }
 
+    // Scale gold marketPrice so Gold page matches Dashboard total exactly
+    const syncedGold=latestVals['Gold MTS']?.value;
+    if(syncedGold&&gold.length>0){
+      const curGoldTotal=gold.reduce((s,g)=>s+g.weight*g.marketPrice,0);
+      if(curGoldTotal>0){
+        const scale=syncedGold/curGoldTotal;
+        gold=gold.map(g=>({...g,marketPrice:Math.round(g.marketPrice*scale*100)/100}));
+        sv('inv_gold',gold);
+      }
+    }
+
     // Compute monthly snapshots + save
     const snaps=_computeSnapshots(newTxs);
     transactions=newTxs;
