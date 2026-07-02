@@ -2717,7 +2717,7 @@ function _parseAllTransJSONP(table){
     if(!cell||cell.v==null)return '';
     if(typeof cell.v==='string'&&cell.v.startsWith('Date(')){
       const m=cell.v.match(/Date\((\d+),(\d+),(\d+)\)/);
-      if(m){const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return `${+m[3]}-${mo[+m[2]]}-${String(m[1]).slice(2)}`;}
+      if(m){const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return `${+m[3]}-${mo[+m[2]]}-${m[1]}`;}
     }
     return cell.f!=null?String(cell.f).trim():String(cell.v).trim();
   };
@@ -2815,9 +2815,10 @@ function fetchGvizJSONP(sheetId, sheetName){
 }
 
 // Fetch raw gviz table (returns resp.table) — used for AllTrans sync
+let _gvizSeq=0;
 function fetchGvizTable(sheetId, sheetName, gid=null){
   return new Promise(resolve=>{
-    const cb='_gvizTbl'+Date.now();
+    const cb='_gvizTbl'+(++_gvizSeq);
     const timer=setTimeout(()=>{delete window[cb];if(s.parentNode)s.remove();resolve(null);},12000);
     window[cb]=function(resp){
       clearTimeout(timer);delete window[cb];if(s.parentNode)s.remove();
