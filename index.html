@@ -1318,6 +1318,7 @@ const DEFAULT_GOLD=[
 ];
 
 const ld=(k,d)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):d;}catch{return d;}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
 // Version-stamp migration: force-reload defaults on every major schema update
 const _DATA_VER='v7-2026-07-02';
 if(localStorage.getItem('inv_data_ver')!==_DATA_VER){
@@ -2818,7 +2819,7 @@ function fetchGvizJSONP(sheetId, sheetName){
 let _gvizSeq=0;
 function fetchGvizTable(sheetId, sheetName, gid=null){
   return new Promise(resolve=>{
-    const cb='_gvizTbl'+(++_gvizSeq);
+    const cb='_gvizTbl'+Date.now()+'_'+Math.random().toString(36).slice(2);
     const timer=setTimeout(()=>{delete window[cb];if(s.parentNode)s.remove();resolve(null);},12000);
     window[cb]=function(resp){
       clearTimeout(timer);delete window[cb];if(s.parentNode)s.remove();
@@ -3103,10 +3104,8 @@ async function syncFromSheets(){
   if(status)status.textContent='กำลัง sync…';
   try{
     // Use JSONP — works from file:// and GitHub Pages (no CORS restriction)
-    const [table, dashTable] = await Promise.all([
-      fetchGvizTable(_SHEET_ID,null,_ALLTRANS_GID),
-      fetchGvizTable(_SHEET_ID,'Dashboard',null)
-    ]);
+    const table = await fetchGvizTable(_SHEET_ID,null,_ALLTRANS_GID);
+    const dashTable = await fetchGvizTable(_SHEET_ID,'Dashboard',null);
     if(!table)throw new Error('ดึงข้อมูลไม่สำเร็จ — ตรวจสอบสิทธิ์ Google Sheet');
     const newTxs=_parseAllTransJSONP(table);
     if(newTxs.length<5)throw new Error('ข้อมูลน้อยเกินไป ('+newTxs.length+' รายการ) — ตรวจสอบสิทธิ์ Google Sheet');
