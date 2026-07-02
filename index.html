@@ -1174,6 +1174,15 @@ body,html{margin:0;padding:0;background:#0D1B2A;color:#e2e8f0;font-family:'Inter
   </div>
   <div class="card mb6">
     <div class="flex-btw mb4">
+      <div>
+        <div class="label" style="margin:0;">GOLD PRICE HISTORY</div>
+        <div id="goldPriceChg" style="font-size:12px;color:var(--em2);margin-top:2px;"></div>
+      </div>
+    </div>
+    <div style="position:relative;height:220px;"><canvas id="goldPriceChart"></canvas></div>
+  </div>
+  <div class="card mb6">
+    <div class="flex-btw mb4">
       <div class="label" style="margin:0;">Recent Transactions</div>
       <div style="font-size:11px;color:var(--text3);">50 รายการล่าสุด</div>
     </div>
@@ -1374,7 +1383,7 @@ function showPage(id,btn){
   if(id==='pvd'){renderPvdTable();renderPageTx('TISCO PVD','pvdPageTx');}
   if(id==='insurance'){renderInsuranceTables();renderPageTx('AIA Insurance','insPageTx');}
   if(id==='funds')renderFundsPage();
-  if(id==='gold')renderGoldPage();
+  if(id==='gold'){renderGoldPage();setTimeout(()=>initGoldPriceChart(),80);}
 }
 
 function toast(msg){
@@ -2231,6 +2240,36 @@ function renderFundsPage(){
       data:rows,search:false,sort:true,autoWidth:false,
     }).render(fundWrap);
   }
+}
+
+let goldPriceChart=null;
+function initGoldPriceChart(){
+  const ctx=document.getElementById('goldPriceChart');if(!ctx)return;
+  if(goldPriceChart){goldPriceChart.destroy();goldPriceChart=null;}
+  const buys=transactions.filter(t=>t.asset==='Gold MTS'&&t.type==='buy'&&t.price&&t.date)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  if(buys.length<2)return;
+  const labels=buys.map(t=>{const[y,m,d]=t.date.split('-');return`${d}/${m}/${y.slice(2)}`;});
+  const data=buys.map(t=>t.price);
+  const first=data[0],last=data[data.length-1];
+  const chg=last-first;const pctChg=((chg/first)*100).toFixed(1);
+  const chgEl=document.getElementById('goldPriceChg');
+  if(chgEl)chgEl.textContent=(chg>=0?'+':'')+fmtN(chg)+'/g ('+pctChg+'%) All time';
+  if(window.ChartDataLabels)Chart.register(ChartDataLabels);
+  goldPriceChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,fill:true,tension:.4,
+    backgroundColor:'rgba(234,179,8,.12)',borderColor:'#f59e0b',borderWidth:2,
+    pointRadius:4,pointHoverRadius:6,pointBackgroundColor:'#f59e0b'}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>' ฿'+c.raw.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'/g'}},
+        datalabels:window.ChartDataLabels?{display:true,anchor:'end',align:'top',offset:4,
+          formatter:v=>'฿'+Math.round(v/100)*100>0?'฿'+Math.round(v).toLocaleString():'฿'+Math.round(v),
+          color:'#475569',font:{size:10,weight:'600'},
+          backgroundColor:'rgba(255,255,255,.85)',borderRadius:4,
+          padding:{top:2,bottom:2,left:4,right:4}}:{display:false}},
+      scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10}}},
+        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#64748b',font:{size:10},
+          callback:v=>'฿'+Math.round(v).toLocaleString()}}}}});
 }
 
 function renderGoldPage(){
@@ -3188,7 +3227,7 @@ async function syncFromSheets(){
     const dot=document.getElementById('liveDot');if(dot)dot.style.display='block';
 
     renderDashboard();
-    setTimeout(()=>{initDonut();initLine();initAssetLine(12);},120);
+    setTimeout(()=>{initDonut();initLine();initAssetLine(12);if(document.getElementById('page-gold')?.classList.contains('active'))initGoldPriceChart();},120);
     if(btn){btn.disabled=false;btn.innerHTML='↻';btn.style.opacity='1';}
   }catch(e){
     console.error('Sync error:',e);
