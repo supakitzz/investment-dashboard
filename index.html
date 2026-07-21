@@ -3293,6 +3293,26 @@ async function syncFromSheets(){
           cashBalance=Math.round(stockCash);
           localStorage.setItem('inv_stock_cash',cashBalance);
         }
+
+        // Stock avg cost — mirror the broker's Avg the user maintains in the same section (col D)
+        if(stockHeaderIdx>=0){
+          const avgMap={};
+          for(let i=stockHeaderIdx+1;i<Math.min(sRows.length,stockHeaderIdx+15);i++){
+            const r=sRows[i];
+            const tk=(r&&r.c&&r.c[1]&&typeof r.c[1].v==='string')?r.c[1].v.trim().toUpperCase():null;
+            if(!tk||tk==='COIN'||tk==='THB')continue;
+            if(!/^[A-Z0-9]{2,10}$/.test(tk))continue;
+            const avg=cellNum(r,3);
+            if(avg!=null&&avg>0)avgMap[tk]=avg;
+          }
+          if(Object.keys(avgMap).length>0){
+            stocks=stocks.map(s=>{
+              const a=avgMap[(s.ticker||'').toUpperCase()];
+              return a?{...s,avgCost:a}:s;
+            });
+            sv('inv_stocks',stocks);
+          }
+        }
       }
 
       if(document.getElementById('page-crypto')&&!document.getElementById('page-crypto').classList.contains('hidden')){
